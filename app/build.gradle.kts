@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("androidx.navigation.safeargs")
 }
 
 android {
@@ -40,4 +41,16 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // Jetpack MVVM and Lifecycle
+    implementation(libs.lifecycle.livedata)
+    implementation(libs.lifecycle.viewmodel)
+
+    // Jetpack Navigation and Safe Args
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+
+    // Jetpack Room Database
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler) // Annotation processor for code generation
 }
