@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.navigation.safeargs)
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
 }
 
 android {

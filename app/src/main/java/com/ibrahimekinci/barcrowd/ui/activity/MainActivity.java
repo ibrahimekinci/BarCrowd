@@ -24,12 +24,11 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        FirebaseApp.initializeApp(this);  // Initialize Firebase
+        //FirebaseApp.initializeApp(this);  // Initialize Firebase
       //  NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
        // BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
        // NavigationUI.setupWithNavController(bottomNav, navController);
 
-        setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
