@@ -11,14 +11,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.List;
-
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when; // <-- ADDED THIS IMPORT
+import static org.mockito.Mockito.when;
 
-/**
- * Unit test for {@link GetAllVenuesUseCase}.
- * Tests delegation to VenueRepository.
- */
 @RunWith(MockitoJUnitRunner.class)
 public class GetAllVenuesUseCaseTest {
 
@@ -36,12 +31,14 @@ public class GetAllVenuesUseCaseTest {
     public void testExecute_DelegatesToRepository() {
         // 1. Arrange
         MutableLiveData<List<Venue>> dummyLiveData = new MutableLiveData<>(Collections.emptyList());
-        when(mockRepository.getAllVenues()).thenReturn(dummyLiveData); // 'when' is now recognized
+        // Fix: Ensure the test calls the correct repository method
+        when(mockRepository.getAllVenuesSortedByName()).thenReturn(dummyLiveData);
 
         // 2. Act
         useCase.execute();
 
         // 3. Assert
-        verify(mockRepository, Mockito.times(1)).getAllVenues();
+        // Fix: Verify the correct method is called
+        verify(mockRepository, Mockito.times(1)).getAllVenuesSortedByName();
     }
 }

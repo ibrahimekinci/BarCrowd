@@ -12,7 +12,5 @@ public class TestApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // We leave this empty on purpose.
-        // DO NOT call injector.init(this) here.
     }
 }

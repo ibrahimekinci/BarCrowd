@@ -1,9 +1,13 @@
 package com.ibrahimekinci.barcrowd.data.remote;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.OpenableColumns;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.ibrahimekinci.barcrowd.di.DependencyInjector;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 import com.ibrahimekinci.barcrowd.util.StorageException;
 
@@ -11,17 +15,24 @@ public class StorageWrapper {
     private static final String PROFILE_PHOTO_STORAGE_PATH = "profile_photos/";
     private static final String VIDEO_STORAGE_PATH = "videos/";
     private static final long MAX_PROFILE_PHOTO_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
-    private static final long MAX_VIDEO_SIZE_BYTES = 100 * 1024 * 1024; // 100 MB (adjust as needed)
-    private StorageReference storage = FirebaseStorage.getInstance().getReference();
+    private static final long MAX_VIDEO_SIZE_BYTES = 100 * 1024 * 1024; // 100 MB
 
-    /**
-     * Uploads a profile photo with size validation.
-     * @param fileUri URI of the photo file.
-     * @param userId ID of the user to name the file (e.g., "profile_photos/user1.jpg").
-     * @param callback Callback with the download URL or error.
-     */
+    private final StorageReference storage;
+    private final Context context;
+
+    public StorageWrapper() {
+        this.storage = FirebaseStorage.getInstance().getReference();
+        // Get context from the Application class via the DI
+        this.context = DependencyInjector.getApp().getApplicationContext();
+    }
+
     public void uploadProfilePhoto(Uri fileUri, String userId, Callback<String> callback) {
-        if (getFileSize(fileUri) > MAX_PROFILE_PHOTO_SIZE_BYTES) {
+        long fileSize = getFileSize(fileUri);
+        if (fileSize == -1) {
+            callback.onFailure(new StorageException("Could not determine file size.", null));
+            return;
+        }
+        if (fileSize > MAX_PROFILE_PHOTO_SIZE_BYTES) {
             callback.onFailure(new StorageException("Profile photo exceeds 5 MB limit", null));
             return;
         }
@@ -29,17 +40,17 @@ public class StorageWrapper {
         uploadMedia(fileUri, path, callback);
     }
 
-    /**
-     * Uploads a video with progress tracking.
-     * @param fileUri URI of the video file.
-     * @param videoName Name of the video (e.g., "liveupdate01.mp4").
-     * @param callback Callback with the download URL or error.
-     */
     public void uploadVideo(Uri fileUri, String videoName, Callback<String> callback) {
-        if (getFileSize(fileUri) > MAX_VIDEO_SIZE_BYTES) {
+        long fileSize = getFileSize(fileUri);
+        if (fileSize == -1) {
+            callback.onFailure(new StorageException("Could not determine file size.", null));
+            return;
+        }
+        if (fileSize > MAX_VIDEO_SIZE_BYTES) {
             callback.onFailure(new StorageException("Video exceeds 100 MB limit", null));
             return;
         }
+
         String path = VIDEO_STORAGE_PATH + videoName;
         StorageReference ref = storage.child(path);
         UploadTask uploadTask = ref.putFile(fileUri);
@@ -62,12 +73,6 @@ public class StorageWrapper {
                 });
     }
 
-    /**
-     * Generic media upload method (for internal use or venue photos if needed).
-     * @param fileUri URI of the media file.
-     * @param path Storage path (e.g., "photos/venue1.jpg").
-     * @param callback Callback with the download URL or error.
-     */
     private void uploadMedia(Uri fileUri, String path, Callback<String> callback) {
         StorageReference ref = storage.child(path);
         ref.putFile(fileUri)
@@ -86,23 +91,20 @@ public class StorageWrapper {
                 });
     }
 
-    /**
-     * Retrieves the size of the file at the given URI.
-     * @param fileUri URI of the file.
-     * @return Size in bytes, or -1 if unavailable.
-     */
     private long getFileSize(Uri fileUri) {
-        try {
-            return new java.io.File(fileUri.getPath()).length();
+        try (Cursor cursor = context.getContentResolver().query(fileUri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (!cursor.isNull(sizeIndex)) {
+                    return cursor.getLong(sizeIndex);
+                }
+            }
         } catch (Exception e) {
-            AppLogger.e("Failed to get file size", e);
-            return -1;
+            AppLogger.e("Failed to get file size from ContentResolver", e);
         }
+        return -1; // Indicates failure
     }
 
-    /**
-     * Callback interface for asynchronous operations.
-     */
     public interface Callback<T> {
         void onSuccess(T result);
         void onFailure(StorageException e);

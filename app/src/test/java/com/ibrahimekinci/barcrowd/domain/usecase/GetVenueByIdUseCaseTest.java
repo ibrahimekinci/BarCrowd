@@ -12,10 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Unit test for {@link GetVenueByIdUseCase}.
- * Tests delegation to VenueRepository.
- */
 @RunWith(MockitoJUnitRunner.class)
 public class GetVenueByIdUseCaseTest {
 
@@ -33,7 +29,10 @@ public class GetVenueByIdUseCaseTest {
     public void testExecute_DelegatesToRepositoryAndReturnsResult() {
         // 1. Arrange
         String venueId = "v1";
-        Venue testVenue = new Venue(venueId, "Bar", "Addr", 0, 0, "Desc");
+        Venue testVenue = new Venue(); // Fix: Use default constructor
+        testVenue.setVenueId(venueId);
+        testVenue.setName("Test Venue");
+
         when(mockRepository.getVenueById(venueId)).thenReturn(testVenue);
 
         // 2. Act

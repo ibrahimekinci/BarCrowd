@@ -7,8 +7,6 @@ import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-// No domain models should be needed here, we are testing the database layer.
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,44 +15,68 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
-/**
- * Integration tests for {@link VenueDao}.
- * This test runs on an Android device or emulator and uses a real,
- * in-memory Room database to verify database operations.
- */
 @RunWith(AndroidJUnit4.class)
 public class VenueDaoTest {
 
-    // This rule is REQUIRED to test LiveData synchronously.
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     private AppDatabase db;
     private VenueDao venueDao;
 
-    // Test data
-    private VenueEntity venue1 = new VenueEntity("v1", "Test Bar 1", "Address 1", 0.0, 0.0, "Desc1");
-    private VenueEntity venue2 = new VenueEntity("v2", "Test Cafe 2", "Address 2", 0.0, 0.0, "Desc2");
-    private VenueEntity venue3 = new VenueEntity("v3", "Demo Bar 3", "Address 3", 0.0, 0.0, "Desc3");
+    private VenueEntity venue1; // showOnHomePage = true, older
+    private VenueEntity venue2; // showOnHomePage = true, newer
+    private VenueEntity venue3; // showOnHomePage = false
 
     @Before
     public void createDb() {
         Context context = ApplicationProvider.getApplicationContext();
-        // Instead of creating a real database file,
-        // we create an in-memory database in RAM for testing.
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
-                // Allow queries on the main thread (only for tests)
                 .allowMainThreadQueries()
                 .build();
         venueDao = db.venueDao();
+
+        OpeningHoursEmbedded hours = new OpeningHoursEmbedded();
+        hours.setOhMonday("Closed");
+        long now = System.currentTimeMillis();
+
+        venue1 = new VenueEntity();
+        venue1.setVenueId("v1");
+        venue1.setName("Test Bar 1");
+        venue1.setCreatedAt(new Date(now - 1000)); // Older
+        venue1.setShowOnHomePage(true);
+        venue1.setOpeningHours(hours);
+        venue1.setType("Bar");
+        venue1.setAddress("Address 1");
+        venue1.setLogoUrl("logo1.url");
+
+        venue2 = new VenueEntity();
+        venue2.setVenueId("v2");
+        venue2.setName("Test Cafe 2");
+        venue2.setCreatedAt(new Date(now)); // Newer
+        venue2.setShowOnHomePage(true);
+        venue2.setOpeningHours(hours);
+        venue2.setType("Bar");
+        venue2.setAddress("Address 2");
+        venue2.setLogoUrl("logo2.url");
+
+        venue3 = new VenueEntity();
+        venue3.setVenueId("v3");
+        venue3.setName("Demo Pub 3");
+        venue3.setCreatedAt(new Date(now + 1000)); // Newest
+        venue3.setShowOnHomePage(false); // This one is not on the home page
+        venue3.setOpeningHours(hours);
+        venue3.setType("Pub");
+        venue3.setAddress("Address 3");
+        venue3.setLogoUrl("logo3.url");
     }
 
     @After
@@ -64,76 +86,79 @@ public class VenueDaoTest {
 
     @Test
     public void testInsertAndGetById() throws Exception {
-        // 1. Arrange
         venueDao.insertAll(Arrays.asList(venue1));
-
-        // 2. Act
         VenueEntity retrieved = venueDao.getVenueById("v1");
 
-        // 3. Assert
         assertNotNull(retrieved);
-        assertEquals(venue1.getId(), retrieved.getId());
-        assertEquals(venue1.getName(), retrieved.getName());
+        assertEquals(venue1.getVenueId(), retrieved.getVenueId());
+        assertEquals("Closed", retrieved.getOpeningHours().getOhMonday());
     }
 
     @Test
-    public void testInsertAllAndGetAllVenues() throws Exception {
-        // 1. Arrange
+    public void testGetHomePageVenues_ReturnsAllVenuesSortedByShowOnHome() throws Exception {
         List<VenueEntity> allVenues = Arrays.asList(venue1, venue2, venue3);
         venueDao.insertAll(allVenues);
 
-        // 2. Act
-        // Use 'getOrAwaitValue' helper to get the value from LiveData
-        List<VenueEntity> retrievedList = getOrAwaitValue(venueDao.getAllVenues());
+        // Act
+        List<VenueEntity> retrievedList = getOrAwaitValue(venueDao.getHomePageVenues());
 
-        // 3. Assert
+        // Assert
+        assertNotNull(retrievedList);
+        // Test now expects all 3 venues, sorted by showOnHomePage DESC, then createdAt DESC
+        assertEquals(3, retrievedList.size());
+        assertEquals("v2", retrievedList.get(0).getVenueId()); // show=true, newer
+        assertEquals("v1", retrievedList.get(1).getVenueId()); // show=true, older
+        assertEquals("v3", retrievedList.get(2).getVenueId()); // show=false
+    }
+
+    @Test
+    public void testGetAllVenuesSortedByName() throws Exception {
+        List<VenueEntity> allVenues = Arrays.asList(venue1, venue2, venue3);
+        venueDao.insertAll(allVenues);
+
+        List<VenueEntity> retrievedList = getOrAwaitValue(venueDao.getAllVenuesSortedByName());
+
         assertNotNull(retrievedList);
         assertEquals(3, retrievedList.size());
-        assertEquals("Test Bar 1", retrievedList.get(0).getName());
-        assertEquals("Test Cafe 2", retrievedList.get(1).getName());
-        assertEquals("Demo Bar 3", retrievedList.get(2).getName());
+        assertEquals("Demo Pub 3", retrievedList.get(0).getName());
+        assertEquals("Test Bar 1", retrievedList.get(1).getName());
+        assertEquals("Test Cafe 2", retrievedList.get(2).getName());
     }
 
     @Test
     public void testSearchVenues() throws Exception {
-        // 1. Arrange
         List<VenueEntity> allVenues = Arrays.asList(venue1, venue2, venue3);
         venueDao.insertAll(allVenues);
 
-        // 2. Act
-        // Search for venues containing 'Bar' (v1 and v3)
         List<VenueEntity> searchResult = getOrAwaitValue(venueDao.searchVenues("%Bar%"));
 
-        // 3. Assert
         assertNotNull(searchResult);
-        assertEquals(2, searchResult.size());
-        assertEquals("v1", searchResult.get(0).getId()); // Test Bar 1
-        assertEquals("v3", searchResult.get(1).getId()); // Demo Bar 3
+        assertEquals(1, searchResult.size());
+        assertEquals("v1", searchResult.get(0).getVenueId());
     }
 
     @Test
     public void testInsertAll_OnConflict_ReplacesExisting() throws Exception {
-        // 1. Arrange
-        venueDao.insertAll(Arrays.asList(venue1)); // "Test Bar 1"
+        venueDao.insertAll(Arrays.asList(venue1));
 
-        // A new entity with the same ID (v1) but a different name
-        VenueEntity updatedVenue1 = new VenueEntity("v1", "Updated Name", "Address 1", 0.0, 0.0, "Desc1");
+        VenueEntity updatedVenue1 = new VenueEntity();
+        updatedVenue1.setVenueId("v1");
+        updatedVenue1.setName("Updated Name");
+        updatedVenue1.setShowOnHomePage(true);
+        updatedVenue1.setOpeningHours(new OpeningHoursEmbedded());
+        updatedVenue1.setCreatedAt(new Date());
+        updatedVenue1.setAddress("Address 1");
+        updatedVenue1.setLogoUrl("logo1.url");
+        updatedVenue1.setType("Bar");
 
-        // 2. Act
-        venueDao.insertAll(Arrays.asList(updatedVenue1)); // OnConflictStrategy.REPLACE should work
+        venueDao.insertAll(Arrays.asList(updatedVenue1));
 
-        List<VenueEntity> retrievedList = getOrAwaitValue(venueDao.getAllVenues());
+        List<VenueEntity> retrievedList = getOrAwaitValue(venueDao.getAllVenuesSortedByName());
 
-        // 3. Assert
-        assertEquals(1, retrievedList.size()); // Should only be 1 record
-        assertEquals("Updated Name", retrievedList.get(0).getName()); // Name should be updated
+        assertEquals(1, retrievedList.size());
+        assertEquals("Updated Name", retrievedList.get(0).getName());
     }
 
-
-    /**
-     * Helper method to get the value from a LiveData object.
-     * (Same method we used in unit tests)
-     */
     public static <T> T getOrAwaitValue(final LiveData<T> liveData) throws InterruptedException {
         final Object[] data = new Object[1];
         final CountDownLatch latch = new CountDownLatch(1);
@@ -143,7 +168,6 @@ public class VenueDaoTest {
             latch.countDown();
         });
 
-        // Don't wait forever
         if (!latch.await(2, TimeUnit.SECONDS)) {
             throw new RuntimeException("LiveData value was never set.");
         }

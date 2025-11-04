@@ -1,115 +1,122 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Transformations;
-import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
-import com.ibrahimekinci.barcrowd.data.local.UserDao;
-import com.ibrahimekinci.barcrowd.data.mapper.UserMapper;
+import androidx.lifecycle.MutableLiveData;
+import com.google.firebase.auth.FirebaseUser;
 import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
 import com.ibrahimekinci.barcrowd.data.remote.FirestoreWrapper;
 import com.ibrahimekinci.barcrowd.domain.model.User;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentChange;
-import java.util.concurrent.Executors;
+import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper.AuthCallback;
 
-public class UserRepositoryImpl implements UserRepository {
-    private UserDao dao;
-    private FirestoreWrapper firestore;
-    private FirebaseAuthWrapper authWrapper;
+/**
+ * Firebase-only implementation of UserRepository.
+ * Fetches user data directly from Firestore on demand and does not cache locally in Room.
+ */
+public class UserRepositoryImpl implements UserRepository { // No "abstract" or "implements" error
 
-    public UserRepositoryImpl(AppDatabase db, FirestoreWrapper firestore, FirebaseAuthWrapper authWrapper) {
-        this.dao = db.userDao();
+    private final FirestoreWrapper firestore;
+    private final FirebaseAuthWrapper authWrapper;
+
+    // Use a MutableLiveData to hold the current user object.
+    private final MutableLiveData<User> currentUserData = new MutableLiveData<>(null);
+
+    // Constructor no longer takes AppDatabase
+    public UserRepositoryImpl(FirestoreWrapper firestore, FirebaseAuthWrapper authWrapper) {
         this.firestore = firestore;
         this.authWrapper = authWrapper;
-    }
 
-    @Override
-    public void insertUser(User user) {
-        dao.insert(UserMapper.toEntity(user));
-        AppLogger.d("Local user cached: " + user.getId());
-    }
-
-    @Override
-    public LiveData<User> getUserById(String userId) {
-        syncUsers();
-        return Transformations.map(dao.getUserById(userId), UserMapper::toModel);
-    }
-
-    @Override
-    public User getUserByEmail(String email) {
-        return UserMapper.toModel(dao.getUserByEmail(email));
-    }
-
-    @Override
-    public User getCurrentUser() {
-        FirebaseUser firebaseUser = authWrapper.getCurrentUser();
-        if (firebaseUser != null) {
-            User localUser = getUserByEmail(firebaseUser.getEmail());
-            if (localUser == null) {
-                localUser = new User(firebaseUser.getUid(), firebaseUser.getEmail(), System.currentTimeMillis());
-                insertUser(localUser);
-                AppLogger.d("Cached current user: " + firebaseUser.getUid());
-            }
-            return localUser;
+        // Check for a user immediately on init
+        if (isUserLoggedIn()) {
+            fetchUserDocument(authWrapper.getCurrentUser().getUid());
         }
-        AppLogger.w("Token invalid; force login");
-        return null;
     }
 
+    /**
+     * Returns a LiveData object that will contain the current user's data.
+     */
     @Override
-    public void signUp(String email, String password, FirebaseAuthWrapper.AuthCallback callback) {
-        authWrapper.signUp(email, password, new FirebaseAuthWrapper.AuthCallback() {
-            @Override
-            public void onSuccess(FirebaseUser firebaseUser) {
-                User user = new User(firebaseUser.getUid(), email, System.currentTimeMillis());
-                insertUser(user);
-                AppLogger.i("Sign-up cached: " + firebaseUser.getUid());
-                callback.onSuccess(firebaseUser);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                AppLogger.e("Sign-up failed", e);
-                callback.onFailure(e);
-            }
-        });
+    public LiveData<User> getCurrentUser() {
+        return currentUserData;
     }
 
-    @Override
-    public void signIn(String email, String password, FirebaseAuthWrapper.AuthCallback callback) {
-        authWrapper.signIn(email, password, new FirebaseAuthWrapper.AuthCallback() {
-            @Override
-            public void onSuccess(FirebaseUser firebaseUser) {
-                User user = getUserByEmail(email);
-                if (user == null || !user.getId().equals(firebaseUser.getUid())) {
-                    user = new User(firebaseUser.getUid(), email, System.currentTimeMillis());
-                    insertUser(user);
-                    AppLogger.i("Sign-in cached: " + firebaseUser.getUid());
-                }
-                callback.onSuccess(firebaseUser);
-            }
+    /**
+     * Fetches the User document from Firestore based on the UID
+     * and updates the currentUserData LiveData.
+     */
+    private void fetchUserDocument(String uid) {
+        firestore.getDb().collection("Users").document(uid).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        User user = documentSnapshot.toObject(User.class);
 
-            @Override
-            public void onFailure(Exception e) {
-                AppLogger.e("Sign-in failed", e);
-                callback.onFailure(e);
-            }
-        });
-    }
+                        // --- FIX FOR NullPointerException ---
+                        if (user != null) {
+                            currentUserData.postValue(user);
+                            AppLogger.i("User document fetched: " + user.getUsername());
+                        } else {
+                            AppLogger.e("User document exists but failed to map to User.class");
+                            currentUserData.postValue(null);
+                        }
+                        // --- END FIX ---
 
-    @Override
-    public void syncUsers() {
-        firestore.listenForChanges("users", null, null, snapshots -> {  // Updated to use wrapper with null field
-            for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                if (dc.getType() == DocumentChange.Type.ADDED || dc.getType() == DocumentChange.Type.MODIFIED) {
-                    User user = dc.getDocument().toObject(User.class);
-                    if (user != null) {
-                        insertUser(user);
-                        AppLogger.d("Synced user: " + user.getId() + " (email: " + user.getEmail() + ")");
+                    } else {
+                        AppLogger.w("User is authenticated but no user document found in Firestore!");
+                        currentUserData.postValue(null);
                     }
-                }
+                })
+                .addOnFailureListener(e -> {
+                    AppLogger.e("Failed to fetch user document", e);
+                    currentUserData.postValue(null);
+                });
+    }
+
+    /**
+     * THIS IS THE CORRECTED 5-ARGUMENT signUp METHOD
+     */
+    @Override
+    public void signUp(String email, String password, String fullName, String username, AuthCallback callback) {
+        authWrapper.signUp(email, password, fullName, username, new AuthCallback() {
+            @Override
+            public void onSuccess(FirebaseUser user) {
+                // After sign up, fetch the newly created user document
+                fetchUserDocument(user.getUid());
+                callback.onSuccess(user);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
             }
         });
+    }
+
+    @Override
+    public void signIn(String email, String password, AuthCallback callback) {
+        authWrapper.signIn(email, password, new AuthCallback() {
+            @Override
+            public void onSuccess(FirebaseUser user) {
+                // After sign in, fetch the user document
+                fetchUserDocument(user.getUid());
+                callback.onSuccess(user);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    @Override
+    public void signOut() {
+        authWrapper.signOut();
+        // Clear the user data on sign out
+        currentUserData.postValue(null);
+    }
+
+    @Override
+    public boolean isUserLoggedIn() {
+        return authWrapper.getCurrentUser() != null;
     }
 }

@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
+import com.ibrahimekinci.barcrowd.data.local.OpeningHoursEmbedded;
 import com.ibrahimekinci.barcrowd.data.local.VenueDao;
 import com.ibrahimekinci.barcrowd.data.local.VenueEntity;
 import com.ibrahimekinci.barcrowd.data.remote.FirestoreWrapper;
@@ -23,13 +24,13 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit; // <-- Import
-import org.mockito.junit.MockitoRule; // <-- Import
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -48,12 +49,10 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class VenueRepositoryImplIntegrationTest {
 
-    // --- JUNIT RULES ---
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
-
     @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule(); // <-- Use Mockito's rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     // --- Real Database Components ---
     private AppDatabase db;
@@ -74,62 +73,58 @@ public class VenueRepositoryImplIntegrationTest {
     private VenueRepositoryImpl repository;
 
     // Test data
-    private VenueEntity venueEntity1 = new VenueEntity("v1", "Test Bar 1", "Address 1", 0.0, 0.0, "Desc1");
-    private VenueEntity venueEntity2 = new VenueEntity("v2", "Test Cafe 2", "Address 2", 0.0, 0.0, "Desc2");
+    private VenueEntity venueEntity1;
 
     @Before
     public void setUp() {
-        // MockitoAnnotations.initMocks(this); // <-- We no longer need this
-
-        // 1. Create real in-memory database
         Context context = ApplicationProvider.getApplicationContext();
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class)
                 .allowMainThreadQueries()
                 .build();
-
-        // 2. Get the real DAO from the real database
         realDao = db.venueDao();
-
-        // 3. Create the repository with the REAL db and MOCKED firestore
         repository = new VenueRepositoryImpl(db, mockFirestore);
+
+        // Init test entity
+        venueEntity1 = new VenueEntity();
+        venueEntity1.setVenueId("v1");
+        venueEntity1.setName("Test Bar 1");
+        venueEntity1.setAddress("Address 1");
+        venueEntity1.setLogoUrl("logo1.url");
+        venueEntity1.setType("Bar");
+        venueEntity1.setCreatedAt(new Date());
+        venueEntity1.setShowOnHomePage(true);
+        venueEntity1.setOpeningHours(new OpeningHoursEmbedded());
     }
 
     @After
     public void tearDown() throws IOException {
-        // This should no longer crash as 'db' will be successfully initialized
         db.close();
     }
 
     @Test
     public void testGetVenueById_ReadsFromRealDaoAndMapsToModel() {
-        // 1. Arrange
         realDao.insertAll(Arrays.asList(venueEntity1));
 
-        // 2. Act
-        Venue result = repository.getVenueById("v1");
+        Venue result = repository.getVenueById("v1"); // This is a blocking call
 
-        // 3. Assert
         assertNotNull(result);
-        assertEquals("v1", result.getId());
+        assertEquals("v1", result.getVenueId());
         assertEquals("Test Bar 1", result.getName());
     }
 
     @Test
-    public void testGetAllVenues_ReadsFromRealDaoAndTriggersSync() throws Exception {
-        // 1. Arrange
-        realDao.insertAll(Arrays.asList(venueEntity1, venueEntity2));
+    public void testGetHomePageVenues_ReadsFromRealDaoAndTriggersSync() throws Exception {
+        realDao.insertAll(Arrays.asList(venueEntity1));
 
-        // 2. Act
-        LiveData<List<Venue>> liveDataResult = repository.getAllVenues();
+        LiveData<List<Venue>> liveDataResult = repository.getHomePageVenues();
 
-        // 3. Assert
         List<Venue> resultList = getOrAwaitValue(liveDataResult);
         assertNotNull(resultList);
-        assertEquals(2, resultList.size());
-        assertEquals("v1", resultList.get(0).getId());
+        assertEquals(1, resultList.size());
+        assertEquals("v1", resultList.get(0).getVenueId());
 
         verify(mockFirestore).listenForChanges(
-                eq("venues"),
+                eq("Venues"),
                 isNull(),
                 isNull(),
                 any(FirestoreWrapper.Listener.class)
@@ -138,22 +133,35 @@ public class VenueRepositoryImplIntegrationTest {
 
     @Test
     public void testSyncVenues_OnFirestoreUpdate_WritesToRealDao() throws Exception {
-        // 1. Arrange
-        Venue firestoreVenue = new Venue("v_fs", "Firestore Venue", "Cloud Address", 1.0, 1.0, "FS Desc");
+        // This is the data we will "fake" coming from Firestore
+        Venue firestoreVenue = new Venue();
+        firestoreVenue.setVenueId("v_fs");
+        firestoreVenue.setName("Firestore Venue");
+        firestoreVenue.setAddress("Cloud Address");
+        firestoreVenue.setType("Pub");
+        firestoreVenue.setLogoUrl("logo.url");
+
         when(mockDocSnapshot.toObject(Venue.class)).thenReturn(firestoreVenue);
         when(mockQuerySnapshot.getDocuments()).thenReturn(Collections.singletonList(mockDocSnapshot));
 
-        // 2. Act
+        // Act
         repository.syncVenues();
+
         verify(mockFirestore).listenForChanges(
-                eq("venues"),
+                eq("Venues"),
                 isNull(),
                 isNull(),
                 firestoreListenerCaptor.capture()
         );
+
+        // Simulate an update from Firestore
         firestoreListenerCaptor.getValue().onUpdate(mockQuerySnapshot);
 
-        // 3. Assert
+        // Allow the background thread from insertVenues to run
+        Thread.sleep(500);
+
+        // Assert
+        // Check the real database to see if the data was *actually* written
         VenueEntity writtenEntity = realDao.getVenueById("v_fs");
         assertNotNull(writtenEntity);
         assertEquals("Firestore Venue", writtenEntity.getName());

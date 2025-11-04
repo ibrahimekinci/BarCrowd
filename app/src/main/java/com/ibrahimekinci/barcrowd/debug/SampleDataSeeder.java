@@ -15,45 +15,52 @@ public class SampleDataSeeder {
 
     private static final String TAG = "SampleDataSeeder";
 
+    // --- PASTE YOUR 10 NEW LINKS HERE ---
+    // Make sure to match the file names from your screenshot
+
+    // Using the new project links: barcrowd-5a1a9
+    private static final String VENUE_1_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue1.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
+    private static final String VENUE_2_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue2.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String VENUE_3_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue3.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String VENUE_4_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue4.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String VENUE_5_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue5.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+
+    private static final String UPDATE_1_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate1.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String UPDATE_2_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate2.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String UPDATE_3_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate3.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String UPDATE_4_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate4.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String UPDATE_5_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate5.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+
+    // --- END OF LINKS ---
+
     /**
      * Checks if data already exists, then executes the seeding process.
-     * This should only be run in debug builds.
      */
     public static void seedDatabase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // --- CHECK IF DATA ALREADY EXISTS ---
         db.collection("Users").document("user1-ibrahim").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null && task.getResult().exists()) {
-                    // Document exists, so data is already seeded.
                     Log.d(TAG, "Sample data already exists. Skipping seeding.");
                 } else {
-                    // Document does not exist (database is empty), so seed the data.
                     Log.d(TAG, "No sample data found. Seeding database...");
                     performSeed(db);
                 }
             } else {
-                // Failed to check for data (e.g., no internet on first launch)
                 Log.e(TAG, "Failed to check for existing data.", task.getException());
             }
         });
-        // --- END OF CHECK ---
     }
 
     /**
      * Performs the actual data seeding.
-     * This is called by seedDatabase() only if data does not exist.
      */
     private static void performSeed(FirebaseFirestore db) {
-        // Get the current time as the base for all timestamps
         long baseTimeMillis = System.currentTimeMillis();
-
-        // Stagger seeding to create a logical timeline
         seedUsers(db, baseTimeMillis);
-        seedVenues(db, baseTimeMillis + 5000); // 5 seconds after users
-        seedLiveUpdates(db, baseTimeMillis + 10000); // 10 seconds after users
-
+        seedVenues(db, baseTimeMillis + 5000);
+        seedLiveUpdates(db, baseTimeMillis + 10000);
         Log.d(TAG, "Sample data seeding complete.");
     }
 
@@ -67,7 +74,7 @@ public class SampleDataSeeder {
             user1.put("fullName", "Ibrahim Ekinci");
             user1.put("username", "ibrahim");
             user1.put("email", "ibrahim@test.com");
-            user1.put("profilePhotoUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/profile_placeholder.png?alt=media&token=e8b1b1f8-0e7d-4b8c-8f2c-5b6d9f6e3c1a");
+            user1.put("profilePhotoUrl", VENUE_1_URL);
             user1.put("isTrusted", true);
             user1.put("isDeleted", false);
             user1.put("deletedAt", null);
@@ -134,12 +141,11 @@ public class SampleDataSeeder {
     private static void seedVenues(FirebaseFirestore db, long startTimeMillis) {
         try {
             // Venue 1: Revolver Upstairs (Club)
-            String venue1Logo = "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue01.jpg?alt=media&token=e68f5137-a348-42cd-b5d5-37601be76780";
             Map<String, Object> venue1 = new HashMap<>();
             venue1.put("venueId", "venue1-revolver");
             venue1.put("name", "Revolver Upstairs");
             venue1.put("type", "Club");
-            venue1.put("logoUrl", venue1Logo);
+            venue1.put("logoUrl", VENUE_1_URL);
             venue1.put("address", "229 Chapel St, Prahran VIC 3181");
             venue1.put("latitude", -37.8493);
             venue1.put("longitude", 144.9939);
@@ -152,19 +158,18 @@ public class SampleDataSeeder {
             venue1.put("lastCrowdLevel", "High");
             venue1.put("averageWaitTime", "15–30");
             venue1.put("lastWaitTime", "30–45");
-            venue1.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 3600000))); // 1 hour ago
+            venue1.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 3600000)));
             venue1.put("mostPopulousAge", "25–30");
             venue1.put("showOnHomePage", true);
             venue1.put("createdAt", new Timestamp(new Date(startTimeMillis)));
             db.collection("Venues").document("venue1-revolver").set(venue1);
 
             // Venue 2: Section 8 (Bar)
-            String venue2Logo = "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue02.jpg?alt=media&token=7dc1261c-436d-4454-bade-3d21232effdf";
             Map<String, Object> venue2 = new HashMap<>();
             venue2.put("venueId", "venue2-section8");
             venue2.put("name", "Section 8");
             venue2.put("type", "Bar");
-            venue2.put("logoUrl", venue2Logo);
+            venue2.put("logoUrl", VENUE_2_URL);
             venue2.put("address", "27-29 Tattersalls Ln, Melbourne VIC 3000");
             venue2.put("latitude", -37.8105);
             venue2.put("longitude", 144.9654);
@@ -177,19 +182,18 @@ public class SampleDataSeeder {
             venue2.put("lastCrowdLevel", "Medium");
             venue2.put("averageWaitTime", "5–15");
             venue2.put("lastWaitTime", "5–15");
-            venue2.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 1800000))); // 30 mins ago
+            venue2.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 1800000)));
             venue2.put("mostPopulousAge", "21–24");
             venue2.put("showOnHomePage", true);
             venue2.put("createdAt", new Timestamp(new Date(startTimeMillis + 1000)));
             db.collection("Venues").document("venue2-section8").set(venue2);
 
             // Venue 3: The Imperial Hotel (Pub)
-            String venue3Logo = "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue03.jpg?alt=media&token=d88432d3-f728-4b82-9de6-26a9459cf630";
             Map<String, Object> venue3 = new HashMap<>();
             venue3.put("venueId", "venue3-imperial");
             venue3.put("name", "The Imperial Hotel");
             venue3.put("type", "Pub");
-            venue3.put("logoUrl", venue3Logo);
+            venue3.put("logoUrl", VENUE_3_URL);
             venue3.put("address", "2-8 Bourke St, Melbourne VIC 3000");
             venue3.put("latitude", -37.8093);
             venue3.put("longitude", 144.9705);
@@ -202,19 +206,18 @@ public class SampleDataSeeder {
             venue3.put("lastCrowdLevel", "Low");
             venue3.put("averageWaitTime", "0–5");
             venue3.put("lastWaitTime", "0–5");
-            venue3.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 600000))); // 10 mins ago
+            venue3.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 600000)));
             venue3.put("mostPopulousAge", "30–35");
             venue3.put("showOnHomePage", true);
             venue3.put("createdAt", new Timestamp(new Date(startTimeMillis + 2000)));
             db.collection("Venues").document("venue3-imperial").set(venue3);
 
             // Venue 4: Cherry Bar (Bar)
-            String venue4Logo = "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue04.jpg?alt=media&token=c6dc4ddf-14b7-4993-97d0-e997106a7ecc";
             Map<String, Object> venue4 = new HashMap<>();
             venue4.put("venueId", "venue4-cherry");
             venue4.put("name", "Cherry Bar");
             venue4.put("type", "Bar");
-            venue4.put("logoUrl", venue4Logo);
+            venue4.put("logoUrl", VENUE_4_URL);
             venue4.put("address", "68 Little Collins St, Melbourne VIC 3000");
             venue4.put("latitude", -37.8120);
             venue4.put("longitude", 144.9702);
@@ -227,19 +230,18 @@ public class SampleDataSeeder {
             venue4.put("lastCrowdLevel", "Medium");
             venue4.put("averageWaitTime", "15–30");
             venue4.put("lastWaitTime", "15–30");
-            venue4.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 300000))); // 5 mins ago
+            venue4.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 300000)));
             venue4.put("mostPopulousAge", "25–30");
             venue4.put("showOnHomePage", true);
             venue4.put("createdAt", new Timestamp(new Date(startTimeMillis + 3000)));
             db.collection("Venues").document("venue4-cherry").set(venue4);
 
             // Venue 5: New Guernica (Club)
-            String venue5Logo = "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue05.jpg?alt=media&token=3b3a06fd-8112-4d02-afe4-83785b7d09e0";
             Map<String, Object> venue5 = new HashMap<>();
             venue5.put("venueId", "venue5-guernica");
             venue5.put("name", "New Guernica");
             venue5.put("type", "Club");
-            venue5.put("logoUrl", venue5Logo);
+            venue5.put("logoUrl", VENUE_5_URL);
             venue5.put("address", "64 Smith St, Collingwood VIC 3066");
             venue5.put("latitude", -37.8082);
             venue5.put("longitude", 144.9839);
@@ -252,7 +254,7 @@ public class SampleDataSeeder {
             venue5.put("lastCrowdLevel", "High");
             venue5.put("averageWaitTime", "15–30");
             venue5.put("lastWaitTime", "15–30");
-            venue5.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 120000))); // 2 mins ago
+            venue5.put("crowdLevelUpdatedAt", new Timestamp(new Date(startTimeMillis - 120000)));
             venue5.put("mostPopulousAge", "18–21");
             venue5.put("showOnHomePage", true);
             venue5.put("createdAt", new Timestamp(new Date(startTimeMillis + 4000)));
@@ -266,6 +268,7 @@ public class SampleDataSeeder {
 
     /**
      * Seeds 5 sample live updates into the /LiveUpdates collection.
+     * This version includes denormalized data (venueName, venueType, venueLogoUrl).
      */
     private static void seedLiveUpdates(FirebaseFirestore db, long startTimeMillis) {
         try {
@@ -278,11 +281,15 @@ public class SampleDataSeeder {
             update1.put("waitTime", "30–45");
             update1.put("ageRange", "25–30");
             update1.put("description", "Line is huge, but moving. Inside is packed.");
-            update1.put("mediaUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/liveupdate01.mp4?alt=media&token=f2a3ea6f-157a-4a31-a9bf-a52c69cb46d0");
-            update1.put("thumbnailUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue01.jpg?alt=media&token=e68f5137-a348-42cd-b5d5-37601be76780");
+            update1.put("mediaUrl", UPDATE_1_URL);
+            update1.put("thumbnailUrl", VENUE_1_URL);
             update1.put("isDeleted", false);
             update1.put("deletedAt", null);
             update1.put("createdAt", new Timestamp(new Date(startTimeMillis)));
+            // Denormalized data
+            update1.put("venueName", "Revolver Upstairs");
+            update1.put("venueType", "Club");
+            update1.put("venueLogoUrl", VENUE_1_URL);
             db.collection("LiveUpdates").document("update1").set(update1);
 
             // Live Update 2 (User 2 @ Venue 2)
@@ -294,11 +301,15 @@ public class SampleDataSeeder {
             update2.put("waitTime", "5–15");
             update2.put("ageRange", "21–24");
             update2.put("description", "Super chill vibes, easy to get a drink.");
-            update2.put("mediaUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/liveupdate02.mp4?alt=media&token=2e7a8fa0-930b-4aeb-97a6-ff712d5898b6");
-            update2.put("thumbnailUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue02.jpg?alt=media&token=7dc1261c-436d-4454-bade-3d21232effdf");
+            update2.put("mediaUrl", UPDATE_2_URL);
+            update2.put("thumbnailUrl", VENUE_2_URL);
             update2.put("isDeleted", false);
             update2.put("deletedAt", null);
             update2.put("createdAt", new Timestamp(new Date(startTimeMillis + 1000)));
+            // Denormalized data
+            update2.put("venueName", "Section 8");
+            update2.put("venueType", "Bar");
+            update2.put("venueLogoUrl", VENUE_2_URL);
             db.collection("LiveUpdates").document("update2").set(update2);
 
             // Live Update 3 (User 3 @ Venue 3)
@@ -310,11 +321,15 @@ public class SampleDataSeeder {
             update3.put("waitTime", "0–5");
             update3.put("ageRange", "30–35");
             update3.put("description", "Quiet night, perfect for a pub meal.");
-            update3.put("mediaUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/liveupdate03.mp4?alt=media&token=6c373ae3-8a24-46c6-a7c3-5ec9658e2782");
-            update3.put("thumbnailUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue03.jpg?alt=media&token=d88432d3-f728-4b82-9de6-26a9459cf630");
+            update3.put("mediaUrl", UPDATE_3_URL);
+            update3.put("thumbnailUrl", VENUE_3_URL);
             update3.put("isDeleted", false);
             update3.put("deletedAt", null);
             update3.put("createdAt", new Timestamp(new Date(startTimeMillis + 2000)));
+            // Denormalized data
+            update3.put("venueName", "The Imperial Hotel");
+            update3.put("venueType", "Pub");
+            update3.put("venueLogoUrl", VENUE_3_URL);
             db.collection("LiveUpdates").document("update3").set(update3);
 
             // Live Update 4 (User 4 @ Venue 4)
@@ -326,11 +341,15 @@ public class SampleDataSeeder {
             update4.put("waitTime", "15–30");
             update4.put("ageRange", "25–30");
             update4.put("description", "Band is setting up, decent crowd.");
-            update4.put("mediaUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/liveupdate04.mp4?alt=media&token=13b7e4a6-26d9-4c11-8339-49c054c1d9c2");
-            update4.put("thumbnailUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue04.jpg?alt=media&token=c6dc4ddf-14b7-4993-97d0-e997106a7ecc");
+            update4.put("mediaUrl", UPDATE_4_URL);
+            update4.put("thumbnailUrl", VENUE_4_URL);
             update4.put("isDeleted", false);
             update4.put("deletedAt", null);
             update4.put("createdAt", new Timestamp(new Date(startTimeMillis + 3000)));
+            // Denormalized data
+            update4.put("venueName", "Cherry Bar");
+            update4.put("venueType", "Bar");
+            update4.put("venueLogoUrl", VENUE_4_URL);
             db.collection("LiveUpdates").document("update4").set(update4);
 
             // Live Update 5 (User 5 @ Venue 5)
@@ -342,11 +361,15 @@ public class SampleDataSeeder {
             update5.put("waitTime", "15–30");
             update5.put("ageRange", "18–21");
             update5.put("description", "Place is buzzing, DJ is great!");
-            update5.put("mediaUrl", "https://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/liveupdate05.mp4?alt=media&token=bb6248d7-1dcd-4be7-92c4-dd90115a2d53");
-            update5.put("thumbnailUrl", "httpsS://firebasestorage.googleapis.com/v0/b/barcrowd-ee642.firebasestorage.app/o/vanue05.jpg?alt=media&token=3b3a06fd-8112-4d02-afe4-83785b7d09e0");
+            update5.put("mediaUrl", UPDATE_5_URL);
+            update5.put("thumbnailUrl", VENUE_5_URL); // Fixed typo from 'httpsS'
             update5.put("isDeleted", false);
             update5.put("deletedAt", null);
             update5.put("createdAt", new Timestamp(new Date(startTimeMillis + 4000)));
+            // Denormalized data
+            update5.put("venueName", "New Guernica");
+            update5.put("venueType", "Club");
+            update5.put("venueLogoUrl", VENUE_5_URL);
             db.collection("LiveUpdates").document("update5").set(update5);
 
             Log.d(TAG, "5 live updates seeded successfully.");
