@@ -3,17 +3,182 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2025, 11, 26);
+    // =====================================================================
+    // HELPER FUNCTIONS
+    // =====================================================================
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the authenticated user's ID matches the document ID.
+     */
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if a user is marked as 'isTrusted' in their profile.
+     * This requires one read operation.
+     */
+    function isTrustedUser(userId) {
+      return exists(/databases/$(database)/documents/Users/$(userId))
+             && get(/databases/$(database)/documents/Users/$(userId)).data.isTrusted == true;
+    }
+
+    /**
+     * Validates all fields for a User document according to the schema.
+     */
+    function isValidUserData(data) {
+      return data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 100
+             && data.username is string && data.username.size() >= 3 && data.username.size() <= 30
+             && data.email is string && data.email.matches('^[^@]+@[^@]+\\.[^@]+$')
+             && data.isTrusted is bool
+             && data.isDeleted is bool
+             && (data.deletedAt == null || data.deletedAt is timestamp)
+             && ('profilePhotoUrl' in data ? (data.profilePhotoUrl is string || data.profilePhotoUrl == null) : true);
+    }
+
+    /**
+     * Validates all fields for a Venue document according to the schema.
+     */
+    function isValidVenueData(data) {
+      let crowdLevels = ["Low", "Medium", "High"];
+      let waitTimes = ["0–5", "5–15", "15–30", "30–45", "45+"];
+      let venueTypes = ["Bar", "Club", "Pub"];
+      let ageRanges = ["18–21", "21–24", "25–30", "30–35", "35+"];
+
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100
+             && data.type is string && data.type in venueTypes
+             && data.logoUrl is string && data.logoUrl.matches('^https://firebasestorage.googleapis.com/.*')
+             && data.address is string && data.address.size() > 0
+             && data.latitude is number && data.latitude >= -90 && data.latitude <= 90
+             && data.longitude is number && data.longitude >= -180 && data.longitude <= 180
+             && data.openingHours is map
+             && (data.crowdLevelUpdatedAt == null || data.crowdLevelUpdatedAt is timestamp);
+    }
+
+    /**
+     * Validates all fields for a LiveUpdate document according to the schema.
+     */
+    function isValidLiveUpdateData(data) {
+       let crowdLevels = ["Low", "Medium", "High"];
+       let waitTimes = ["0–5", "5–15", "15–30", "30–45", "45+"];
+       let ageRanges = ["18–21", "21–24", "25–30", "30–35", "35+"];
+
+       return data.venueId is string && exists(/databases/$(database)/documents/Venues/$(data.venueId))
+              && data.userId is string
+              && data.crowdLevel is string && data.crowdLevel in crowdLevels
+              && data.waitTime is string && data.waitTime in waitTimes
+              && data.ageRange is string && data.ageRange in ageRanges
+              && data.mediaUrl is string && data.mediaUrl.matches('^https://firebasestorage.googleapis.com/.*')
+              && ('description' in data ? data.description is string && data.description.size() <= 280 : true)
+              && ('thumbnailUrl' in data ? (data.thumbnailUrl is string || data.thumbnailUrl == null) : true)
+              && data.isDeleted is bool
+              && (data.deletedAt == null || data.deletedAt is timestamp);
+    }
+
+    // =====================================================================
+    // COLLECTION RULES
+    // =====================================================================
+
+    /**
+     * Users Collection
+     * - Anyone authenticated can read profiles.
+     * - Users can only create/update their own profile.
+     */
+    match /Users/{userId} {
+      // Allow any authenticated user to read a user's profile.
+      allow read: if isAuth();
+
+      // Allow a user to create their own profile document.
+      allow create: if isOwner(userId)
+                    && isValidUserData(request.resource.data)
+                    // Enforce default values on create
+                    && request.resource.data.isTrusted == false
+                    && request.resource.data.isDeleted == false
+                    && request.resource.data.deletedAt == null;
+
+      // Allow a user to update their own profile.
+      allow update: if isOwner(userId)
+                    && isValidUserData(request.resource.data)
+                    // User cannot make themselves trusted (admin only)
+                    && request.resource.data.isTrusted == resource.data.isTrusted
+                    // User cannot change their create time
+                    && request.resource.data.createdAt == resource.data.createdAt
+                    // User cannot change their email (should be done via Auth)
+                    && request.resource.data.email == resource.data.email
+                    // Handle soft-delete logic
+                    && (request.resource.data.isDeleted == resource.data.isDeleted || request.resource.data.isDeleted == true) // Can only set to true
+                    && (request.resource.data.deletedAt == null ||
+                         (request.resource.data.isDeleted == true && request.resource.data.deletedAt == request.time)); // If deleting, set time
+
+      // Do not allow clients to permanently delete user documents.
+      allow delete: if false;
+    }
+
+
+    /**
+     * Venues Collection
+     * - Anyone can read venue information.
+     * - Only 'isTrusted' users or admins can create or update venues.
+     */
+    match /Venues/{venueId} {
+      // Venue data is public.
+      allow read: if true;
+
+      // Creating and updating venues is restricted to trusted users.
+      // This rule assumes an admin/moderator sets 'isTrusted = true' on a User document.
+      allow create, update: if isAuth()
+                             && isTrustedUser(request.auth.uid)
+                             && isValidVenueData(request.resource.data);
+
+      // Do not allow clients to permanently delete venues.
+      allow delete: if false;
+    }
+
+
+    /**
+     * LiveUpdates Collection
+     * - Anyone can read live updates.
+     * - Users can only create updates for themselves.
+     * - Users can only update their own posts (e.g., to soft-delete).
+     */
+    match /LiveUpdates/{updateId} {
+      // All updates are public.
+      allow read: if true;
+
+      // Any authenticated user can create an update...
+      allow create: if isAuth()
+                    && isValidLiveUpdateData(request.resource.data)
+                    // ...as long as they are creating it for themselves
+                    && request.resource.data.userId == request.auth.uid
+                    // ...and it respects default values.
+                    && request.resource.data.isDeleted == false
+                    && request.resource.data.deletedAt == null;
+
+      // Only the original poster can update their update (e.g., to soft-delete it).
+      allow update: if isAuth()
+                    && isValidLiveUpdateData(request.resource.data)
+                    // Must be the owner
+                    && resource.data.userId == request.auth.uid
+                    // Cannot change ownership or venue link
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.venueId == resource.data.venueId
+                    // Cannot change the original media or timestamp
+                    && request.resource.data.mediaUrl == resource.data.mediaUrl
+                    && request.resource.data.createdAt == resource.data.createdAt
+                    // Handle soft-delete logic (can set isDeleted to true, but not back to false)
+                    && (request.resource.data.isDeleted == resource.data.isDeleted || request.resource.data.isDeleted == true)
+                    && (request.resource.data.deletedAt == null ||
+                         (request.resource.data.isDeleted == true && request.resource.data.deletedAt == request.time));
+
+      // Do not allow clients to permanently delete updates.
+      allow delete: if false;
     }
   }
 }
