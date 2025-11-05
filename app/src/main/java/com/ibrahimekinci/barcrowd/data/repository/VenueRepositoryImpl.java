@@ -2,13 +2,18 @@ package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
+import androidx.sqlite.db.SimpleSQLiteQuery;
+
 import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
 import com.ibrahimekinci.barcrowd.data.local.VenueDao;
-import com.ibrahimekinci.barcrowd.data.local.VenueEntity; // Import new entity
-import com.ibrahimekinci.barcrowd.data.mapper.VenueMapper; // Import new mapper
+import com.ibrahimekinci.barcrowd.data.local.VenueEntity;
+import com.ibrahimekinci.barcrowd.data.mapper.VenueMapper;
 import com.ibrahimekinci.barcrowd.data.remote.FirestoreWrapper;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
+import com.ibrahimekinci.barcrowd.domain.model.VenueFilterOptions;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,13 +57,44 @@ public class VenueRepositoryImpl implements VenueRepository {
     }
 
     @Override
-    public LiveData<List<Venue>> searchVenues(String query) {
-        // Use the new VenueMapper
-        return Transformations.map(dao.searchVenues(query), entities ->
+    public LiveData<List<Venue>> searchVenues(VenueFilterOptions filters) {
+        SimpleSQLiteQuery query = buildFilterQuery(filters);
+        return Transformations.map(dao.searchVenuesWithFilters(query), entities ->
                 entities.stream()
                         .map(VenueMapper::toModel)
                         .collect(Collectors.toList())
         );
+    }
+
+    private SimpleSQLiteQuery buildFilterQuery(VenueFilterOptions filters) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM venues WHERE 1=1");
+        List<Object> args = new ArrayList<>();
+
+        if (filters.getNameQuery() != null && !filters.getNameQuery().isEmpty()) {
+            sql.append(" AND name LIKE ?");
+            args.add("%" + filters.getNameQuery() + "%");
+        }
+        if (filters.getType() != null && !filters.getType().isEmpty()) {
+            sql.append(" AND type = ?");
+            args.add(filters.getType());
+        }
+        // IMPORTANT: PDF uses 'last' values, so query 'lastCrowdLevel', not 'average'
+        if (filters.getCrowdLevel() != null && !filters.getCrowdLevel().isEmpty()) {
+            sql.append(" AND lastCrowdLevel = ?");
+            args.add(filters.getCrowdLevel());
+        }
+        if (filters.getWaitTime() != null && !filters.getWaitTime().isEmpty()) {
+            sql.append(" AND lastWaitTime = ?");
+            args.add(filters.getWaitTime());
+        }
+        // IMPORTANT: PDF uses 'last' age range, so query 'mostPopulousAge'
+        if (filters.getAgeRange() != null && !filters.getAgeRange().isEmpty()) {
+            sql.append(" AND mostPopulousAge = ?");
+            args.add(filters.getAgeRange());
+        }
+
+        sql.append(" ORDER BY name ASC");
+        return new SimpleSQLiteQuery(sql.toString(), args.toArray());
     }
 
     @Override

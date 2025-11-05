@@ -1,18 +1,22 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import androidx.lifecycle.MutableLiveData;
+
 import com.ibrahimekinci.barcrowd.data.repository.LiveUpdateRepository;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import java.util.Collections;
 import java.util.List;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit test for {@link GetUpdatesForVenueUseCase}.

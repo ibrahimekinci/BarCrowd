@@ -1,10 +1,11 @@
 package com.ibrahimekinci.barcrowd.data.local;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
-import java.util.Date; // Import java.util.Date
+
+import java.util.Date;
 
 /**
  * Room entity for LiveUpdate model, including sync status for offline handling.
@@ -39,44 +40,145 @@ public class LiveUpdateEntity {
 
     private boolean syncStatus; // false if pending sync
 
-    public LiveUpdateEntity() {}
+    public LiveUpdateEntity() {
+    }
 
     // --- Getters ---
     @NonNull
-    public String getUpdateId() { return updateId; }
-    public String getVenueId() { return venueId; }
-    public String getUserId() { return userId; }
-    public String getCrowdLevel() { return crowdLevel; }
-    public String getWaitTime() { return waitTime; }
-    public String getAgeRange() { return ageRange; }
-    public String getDescription() { return description; }
-    public String getMediaUrl() { return mediaUrl; }
-    public String getThumbnailUrl() { return thumbnailUrl; }
-    public boolean isDeleted() { return isDeleted; }
-    public Date getDeletedAt() { return deletedAt; }
-    public String getVenueName() { return venueName; }
-    public String getVenueType() { return venueType; }
-    public String getVenueLogoUrl() { return venueLogoUrl; }
-    public Date getUpdatedAt() { return updatedAt; }
-    public Date getCreatedAt() { return createdAt; }
-    public boolean isSyncStatus() { return syncStatus; }
+    public String getUpdateId() {
+        return updateId;
+    }
+
+    public String getVenueId() {
+        return venueId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getCrowdLevel() {
+        return crowdLevel;
+    }
+
+    public String getWaitTime() {
+        return waitTime;
+    }
+
+    public String getAgeRange() {
+        return ageRange;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public String getVenueName() {
+        return venueName;
+    }
+
+    public String getVenueType() {
+        return venueType;
+    }
+
+    public String getVenueLogoUrl() {
+        return venueLogoUrl;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public boolean isSyncStatus() {
+        return syncStatus;
+    }
 
     // --- Setters ---
-    public void setUpdateId(@NonNull String updateId) { this.updateId = updateId; }
-    public void setVenueId(String venueId) { this.venueId = venueId; }
-    public void setUserId(String userId) { this.userId = userId; }
-    public void setCrowdLevel(String crowdLevel) { this.crowdLevel = crowdLevel; }
-    public void setWaitTime(String waitTime) { this.waitTime = waitTime; }
-    public void setAgeRange(String ageRange) { this.ageRange = ageRange; }
-    public void setDescription(String description) { this.description = description; }
-    public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
-    public void setThumbnailUrl(String thumbnailUrl) { this.thumbnailUrl = thumbnailUrl; }
-    public void setDeleted(boolean deleted) { this.isDeleted = deleted; }
-    public void setDeletedAt(Date deletedAt) { this.deletedAt = deletedAt; }
-    public void setVenueName(String venueName) { this.venueName = venueName; }
-    public void setVenueType(String venueType) { this.venueType = venueType; }
-    public void setVenueLogoUrl(String venueLogoUrl) { this.venueLogoUrl = venueLogoUrl; }
-    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
-    public void setSyncStatus(boolean syncStatus) { this.syncStatus = syncStatus; }
+    public void setUpdateId(@NonNull String updateId) {
+        this.updateId = updateId;
+    }
+
+    public void setVenueId(String venueId) {
+        this.venueId = venueId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setCrowdLevel(String crowdLevel) {
+        this.crowdLevel = crowdLevel;
+    }
+
+    public void setWaitTime(String waitTime) {
+        this.waitTime = waitTime;
+    }
+
+    public void setAgeRange(String ageRange) {
+        this.ageRange = ageRange;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.isDeleted = deleted;
+    }
+
+    public void setDeletedAt(Date deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public void setVenueName(String venueName) {
+        this.venueName = venueName;
+    }
+
+    public void setVenueType(String venueType) {
+        this.venueType = venueType;
+    }
+
+    public void setVenueLogoUrl(String venueLogoUrl) {
+        this.venueLogoUrl = venueLogoUrl;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setSyncStatus(boolean syncStatus) {
+        this.syncStatus = syncStatus;
+    }
 }

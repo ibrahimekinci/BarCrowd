@@ -5,10 +5,14 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+
 import java.util.List;
 
 @Dao
 public interface LiveUpdateDao {
+    @Query("SELECT * FROM live_updates WHERE updateId = :updateId")
+    LiveUpdateEntity getLiveUpdateById(String updateId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(LiveUpdateEntity update);
 
@@ -18,10 +22,12 @@ public interface LiveUpdateDao {
     @Query("SELECT * FROM live_updates WHERE userId = :userId ORDER BY createdAt DESC")
     LiveData<List<LiveUpdateEntity>> getUserContributions(String userId);
 
-    @Query("SELECT * FROM live_updates WHERE syncStatus = 0 ORDER BY createdAt") // Changed from syncStatus = 0
+    @Query("SELECT * FROM live_updates WHERE syncStatus = 0 ORDER BY createdAt")
+        // Changed from syncStatus = 0
     List<LiveUpdateEntity> getPendingUpdates();
 
-    @Query("UPDATE live_updates SET syncStatus = 1 WHERE updateId = :id") // Changed from id
+    @Query("UPDATE live_updates SET syncStatus = 1 WHERE updateId = :id")
+        // Changed from id
     void markAsSynced(String id);
 
     /**

@@ -1,5 +1,13 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -14,7 +22,6 @@ import com.ibrahimekinci.barcrowd.data.remote.FirestoreWrapper;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,16 +36,6 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link VenueRepositoryImpl}.
@@ -52,15 +49,22 @@ public class VenueRepositoryImplTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     // Mocks for dependencies
-    @Mock private AppDatabase mockDb;
-    @Mock private VenueDao mockDao;
-    @Mock private FirestoreWrapper mockFirestore;
+    @Mock
+    private AppDatabase mockDb;
+    @Mock
+    private VenueDao mockDao;
+    @Mock
+    private FirestoreWrapper mockFirestore;
 
     // Mocks for data
-    @Mock private QuerySnapshot mockQuerySnapshot;
-    @Mock private DocumentSnapshot mockDocSnapshot;
-    @Mock private Venue mockVenue;
-    @Mock private VenueEntity mockVenueEntity;
+    @Mock
+    private QuerySnapshot mockQuerySnapshot;
+    @Mock
+    private DocumentSnapshot mockDocSnapshot;
+    @Mock
+    private Venue mockVenue;
+    @Mock
+    private VenueEntity mockVenueEntity;
 
     @Captor
     private ArgumentCaptor<FirestoreWrapper.Listener<QuerySnapshot>> firestoreListenerCaptor;
@@ -105,12 +109,7 @@ public class VenueRepositoryImplTest {
 
         // 3. Assert
         // Verify sync was triggered
-        verify(mockFirestore).listenForChanges(
-                eq("Venues"),
-                isNull(),
-                isNull(),
-                any(FirestoreWrapper.Listener.class)
-        );
+        verify(mockFirestore).listenForChanges(eq("Venues"), isNull(), isNull(), any(FirestoreWrapper.Listener.class));
         // Verify DAO was called
         verify(mockDao).getHomePageVenues();
     }
@@ -127,12 +126,7 @@ public class VenueRepositoryImplTest {
 
         // 3. Assert
         // Verify sync was triggered
-        verify(mockFirestore).listenForChanges(
-                eq("Venues"),
-                isNull(),
-                isNull(),
-                any(FirestoreWrapper.Listener.class)
-        );
+        verify(mockFirestore).listenForChanges(eq("Venues"), isNull(), isNull(), any(FirestoreWrapper.Listener.class));
         // Verify DAO was called
         verify(mockDao).getAllVenuesSortedByName();
     }
@@ -140,8 +134,7 @@ public class VenueRepositoryImplTest {
     @Test
     public void testSyncVenues_OnFirestoreUpdate_InsertsVenuesToDao() {
         // 1. Arrange
-        try (MockedStatic<AppLogger> mockedLogger = Mockito.mockStatic(AppLogger.class);
-             MockedStatic<VenueMapper> mockedMapper = Mockito.mockStatic(VenueMapper.class)) {
+        try (MockedStatic<AppLogger> mockedLogger = Mockito.mockStatic(AppLogger.class); MockedStatic<VenueMapper> mockedMapper = Mockito.mockStatic(VenueMapper.class)) {
 
             when(mockDocSnapshot.toObject(Venue.class)).thenReturn(mockVenue);
             when(mockQuerySnapshot.getDocuments()).thenReturn(Collections.singletonList(mockDocSnapshot));
@@ -151,9 +144,7 @@ public class VenueRepositoryImplTest {
             repository.syncVenues(); // Registers the listener
 
             // Capture and trigger the listener
-            verify(mockFirestore).listenForChanges(
-                    eq("Venues"), isNull(), isNull(), firestoreListenerCaptor.capture()
-            );
+            verify(mockFirestore).listenForChanges(eq("Venues"), isNull(), isNull(), firestoreListenerCaptor.capture());
             firestoreListenerCaptor.getValue().onUpdate(mockQuerySnapshot);
 
             // 3. Assert

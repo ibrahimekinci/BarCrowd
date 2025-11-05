@@ -5,6 +5,9 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RawQuery;
+import androidx.sqlite.db.SimpleSQLiteQuery;
+
 import java.util.List;
 
 @Dao
@@ -17,11 +20,8 @@ public interface VenueDao {
 
     @Query("SELECT * FROM venues WHERE venueId = :venueId")
     VenueEntity getVenueById(String venueId);
-
-    // Your search use case must add the '%' wildcards
-    @Query("SELECT * FROM venues WHERE name LIKE :query ORDER BY name ASC")
-    LiveData<List<VenueEntity>> searchVenues(String query);
-
+    @RawQuery(observedEntities = VenueEntity.class)
+    LiveData<List<VenueEntity>> searchVenuesWithFilters(SimpleSQLiteQuery query);
     /**
      * Gets all venues from the local cache, sorted by name.
      * Used for spinners and "All Venues" lists.

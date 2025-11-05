@@ -1,7 +1,6 @@
 package com.ibrahimekinci.barcrowd.data.remote;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
@@ -73,6 +72,7 @@ public class FirestoreWrapper {
 
     public interface Callback<T> {
         void onSuccess(T result);
+
         void onFailure(Exception e);
     }
 

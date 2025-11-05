@@ -1,18 +1,22 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import androidx.lifecycle.MutableLiveData;
+
 import com.ibrahimekinci.barcrowd.data.repository.VenueRepository;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import java.util.Collections;
 import java.util.List;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GetAllVenuesUseCaseTest {

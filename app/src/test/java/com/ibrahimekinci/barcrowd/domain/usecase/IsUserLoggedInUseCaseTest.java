@@ -1,17 +1,19 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
 import com.ibrahimekinci.barcrowd.data.repository.UserRepository;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.mockito.junit.MockitoJUnitRunner;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import org.mockito.junit.MockitoRule;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IsUserLoggedInUseCaseTest {

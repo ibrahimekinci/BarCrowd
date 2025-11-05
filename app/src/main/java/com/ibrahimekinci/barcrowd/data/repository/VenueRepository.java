@@ -1,7 +1,10 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
+
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
+import com.ibrahimekinci.barcrowd.domain.model.VenueFilterOptions;
+
 import java.util.List;
 
 public interface VenueRepository {
@@ -23,7 +26,7 @@ public interface VenueRepository {
     /**
      * Searches the local cache for venues where the name matches the query.
      */
-    LiveData<List<Venue>> searchVenues(String query);
+    LiveData<List<Venue>> searchVenues(VenueFilterOptions filters);
 
     /**
      * Triggers a one-way sync from Firestore to the local Room database.

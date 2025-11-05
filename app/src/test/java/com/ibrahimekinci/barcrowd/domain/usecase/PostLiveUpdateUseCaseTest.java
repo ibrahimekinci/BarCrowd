@@ -1,5 +1,12 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ibrahimekinci.barcrowd.data.repository.LiveUpdateRepository;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
@@ -17,13 +24,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link PostLiveUpdateUseCase}.
@@ -59,7 +59,9 @@ public class PostLiveUpdateUseCaseTest {
         when(mockVenue.getLogoUrl()).thenReturn("logo.url");
     }
 
-    /** Helper method to create a valid update model from the UI. */
+    /**
+     * Helper method to create a valid update model from the UI.
+     */
     private LiveUpdate createValidUpdateFromUI() {
         LiveUpdate update = new LiveUpdate();
         update.setVenueId("v1");

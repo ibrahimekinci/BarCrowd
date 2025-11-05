@@ -1,10 +1,10 @@
 package com.ibrahimekinci.barcrowd.data.mapper;
 
+import com.google.firebase.Timestamp;
 import com.ibrahimekinci.barcrowd.data.local.OpeningHoursEmbedded;
 import com.ibrahimekinci.barcrowd.data.local.VenueEntity;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
-import com.google.firebase.Timestamp;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.Map;
 

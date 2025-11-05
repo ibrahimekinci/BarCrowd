@@ -4,6 +4,7 @@ import androidx.room.Database;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
+
 import java.util.Date;
 
 @Database(entities = {VenueEntity.class, LiveUpdateEntity.class}, version = 1, exportSchema = false)
@@ -11,6 +12,7 @@ import java.util.Date;
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract VenueDao venueDao();
+
     public abstract LiveUpdateDao liveUpdateDao();
 
     /**

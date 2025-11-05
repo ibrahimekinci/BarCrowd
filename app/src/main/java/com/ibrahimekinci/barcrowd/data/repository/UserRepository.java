@@ -1,8 +1,10 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
+
+import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
+import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper.AuthCallback;
 import com.ibrahimekinci.barcrowd.domain.model.User;
-import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper.AuthCallback; // Import this
 
 /**
  * Repository for user operations.
@@ -12,6 +14,7 @@ public interface UserRepository {
 
     /**
      * Gets the currently authenticated user's data from Firestore.
+     *
      * @return LiveData wrapping the User object, or null if not signed in.
      */
     LiveData<User> getCurrentUser();
@@ -21,6 +24,8 @@ public interface UserRepository {
      * THIS IS THE UPDATED 5-ARGUMENT METHOD
      */
     void signUp(String email, String password, String fullName, String username, AuthCallback callback);
+
+    void updateUser(User user, FirebaseAuthWrapper.AuthCallback callback);
 
     /**
      * Signs in a user via Firebase Auth.

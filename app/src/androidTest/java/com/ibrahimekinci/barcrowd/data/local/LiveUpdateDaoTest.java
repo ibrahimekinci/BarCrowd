@@ -1,6 +1,11 @@
 package com.ibrahimekinci.barcrowd.data.local;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import android.content.Context;
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.room.Room;
@@ -14,15 +19,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Integration tests for {@link LiveUpdateDao}.
@@ -166,9 +166,30 @@ public class LiveUpdateDaoTest {
         liveUpdateDao.insert(update2_v1); // createdAt = now - 1000
         liveUpdateDao.insert(update3_v2); // createdAt = now
         // Create 3 more
-        LiveUpdateEntity update4 = new LiveUpdateEntity(); update4.setUpdateId("u4"); update4.setCreatedAt(new Date(System.currentTimeMillis() + 1000)); update4.setVenueId("v1"); update4.setUserId("user1"); update4.setCrowdLevel("Low"); update4.setWaitTime("0–5"); update4.setAgeRange("18–21");
-        LiveUpdateEntity update5 = new LiveUpdateEntity(); update5.setUpdateId("u5"); update5.setCreatedAt(new Date(System.currentTimeMillis() + 2000)); update5.setVenueId("v2"); update5.setUserId("user1"); update5.setCrowdLevel("Low"); update5.setWaitTime("0–5"); update5.setAgeRange("18–21");
-        LiveUpdateEntity update6_deleted = new LiveUpdateEntity(); update6_deleted.setUpdateId("u6"); update6_deleted.setCreatedAt(new Date(System.currentTimeMillis() + 3000)); update6_deleted.setVenueId("v2"); update6_deleted.setUserId("user1"); update6_deleted.setCrowdLevel("Low"); update6_deleted.setWaitTime("0–5"); update6_deleted.setAgeRange("18–21");
+        LiveUpdateEntity update4 = new LiveUpdateEntity();
+        update4.setUpdateId("u4");
+        update4.setCreatedAt(new Date(System.currentTimeMillis() + 1000));
+        update4.setVenueId("v1");
+        update4.setUserId("user1");
+        update4.setCrowdLevel("Low");
+        update4.setWaitTime("0–5");
+        update4.setAgeRange("18–21");
+        LiveUpdateEntity update5 = new LiveUpdateEntity();
+        update5.setUpdateId("u5");
+        update5.setCreatedAt(new Date(System.currentTimeMillis() + 2000));
+        update5.setVenueId("v2");
+        update5.setUserId("user1");
+        update5.setCrowdLevel("Low");
+        update5.setWaitTime("0–5");
+        update5.setAgeRange("18–21");
+        LiveUpdateEntity update6_deleted = new LiveUpdateEntity();
+        update6_deleted.setUpdateId("u6");
+        update6_deleted.setCreatedAt(new Date(System.currentTimeMillis() + 3000));
+        update6_deleted.setVenueId("v2");
+        update6_deleted.setUserId("user1");
+        update6_deleted.setCrowdLevel("Low");
+        update6_deleted.setWaitTime("0–5");
+        update6_deleted.setAgeRange("18–21");
         update6_deleted.setDeleted(true); // This one is deleted
 
         liveUpdateDao.insert(update4);

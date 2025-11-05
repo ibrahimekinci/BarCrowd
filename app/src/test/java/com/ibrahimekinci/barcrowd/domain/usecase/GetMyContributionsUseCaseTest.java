@@ -1,5 +1,12 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import com.ibrahimekinci.barcrowd.data.repository.LiveUpdateRepository;
 import com.ibrahimekinci.barcrowd.util.ValidationException;
 import com.ibrahimekinci.barcrowd.util.Validators;
@@ -11,13 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for {@link GetMyContributionsUseCase}.

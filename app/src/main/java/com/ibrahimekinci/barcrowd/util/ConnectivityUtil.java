@@ -7,8 +7,6 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 
-import com.ibrahimekinci.barcrowd.util.AppLogger;
-
 public class ConnectivityUtil {
 
     public static boolean isOnline(Context context) {

@@ -1,8 +1,12 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
 import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
+
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.FieldValue;
 import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
 import com.ibrahimekinci.barcrowd.data.local.LiveUpdateDao;
 import com.ibrahimekinci.barcrowd.data.local.LiveUpdateEntity;
@@ -10,10 +14,11 @@ import com.ibrahimekinci.barcrowd.data.mapper.LiveUpdateMapper;
 import com.ibrahimekinci.barcrowd.data.remote.FirestoreWrapper;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
-// import com.ibrahimekinci.barcrowd.util.ConnectivityUtil; // Removed
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -124,5 +129,39 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
                         .map(LiveUpdateMapper::toModel)
                         .collect(Collectors.toList())
         );
+    }
+
+    // data/repository/LiveUpdateRepositoryImpl.java
+    @Override
+    public void softDeleteUpdate(LiveUpdate update, FirestoreWrapper.Callback<Void> callback) {
+        Map<String, Object> softDeleteFields = new HashMap<>();
+        softDeleteFields.put("deleted", true);
+        softDeleteFields.put("deletedAt", FieldValue.serverTimestamp()); // Use server time
+
+        String updateId = update.getUpdateId();
+
+        // 1. Update Firestore
+        firestore.getDb().collection("LiveUpdates").document(updateId)
+                .update(softDeleteFields)
+                .addOnSuccessListener(aVoid -> {
+                    AppLogger.i("Soft deleted update in Firestore: " + updateId);
+
+                    // 2. Update local Room cache
+                    new Thread(() -> {
+                        LiveUpdateEntity entity = dao.getLiveUpdateById(updateId);
+                        if (entity != null) {
+                            entity.setDeleted(true);
+                            entity.setDeletedAt(new Date()); // Approx. time
+                            dao.insert(entity); // .insert() will replace
+                            AppLogger.d("Soft deleted update in Room: " + updateId);
+                        }
+                    }).start();
+
+                    callback.onSuccess(null);
+                })
+                .addOnFailureListener(e -> {
+                    AppLogger.e("Firestore soft delete failed", e);
+                    callback.onFailure(e);
+                });
     }
 }

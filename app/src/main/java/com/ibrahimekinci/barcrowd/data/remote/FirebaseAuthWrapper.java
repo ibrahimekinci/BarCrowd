@@ -1,10 +1,11 @@
 package com.ibrahimekinci.barcrowd.data.remote;
 
 import androidx.annotation.NonNull;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore; // Import Firestore
-import com.ibrahimekinci.barcrowd.domain.model.User; // Import your User model
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.ibrahimekinci.barcrowd.domain.model.User;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 import com.ibrahimekinci.barcrowd.util.AuthException;
 
@@ -24,7 +25,8 @@ public class FirebaseAuthWrapper {
     /**
      * Signs up a new user with email and password.
      * On success, it also creates their user document in the /Users collection.
-     * @param email User's email
+     *
+     * @param email    User's email
      * @param password User's password
      * @param callback Callback for success (with FirebaseUser) or failure
      */
@@ -93,7 +95,8 @@ public class FirebaseAuthWrapper {
     /**
      * Signs in a user with email and password.
      * This method NO LONGER interacts with the local database.
-     * @param email User's email
+     *
+     * @param email    User's email
      * @param password User's password
      * @param callback Callback for success (with FirebaseUser) or failure
      */
@@ -112,6 +115,7 @@ public class FirebaseAuthWrapper {
     /**
      * Gets the currently authenticated FirebaseUser.
      * This method NO LONGER interacts with the local database.
+     *
      * @return FirebaseUser object, or null if not signed in.
      */
     public FirebaseUser getCurrentUser() {
@@ -125,6 +129,7 @@ public class FirebaseAuthWrapper {
 
     public interface AuthCallback {
         void onSuccess(FirebaseUser user);
+
         void onFailure(Exception e);
     }
 }

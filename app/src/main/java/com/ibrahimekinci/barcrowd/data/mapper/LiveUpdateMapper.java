@@ -1,9 +1,8 @@
 package com.ibrahimekinci.barcrowd.data.mapper;
 
+import com.google.firebase.Timestamp;
 import com.ibrahimekinci.barcrowd.data.local.LiveUpdateEntity;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
-import com.google.firebase.Timestamp;
-import java.util.Date;
 
 /**
  * Maps between the LiveUpdate (domain model) and LiveUpdateEntity (local cache entity).

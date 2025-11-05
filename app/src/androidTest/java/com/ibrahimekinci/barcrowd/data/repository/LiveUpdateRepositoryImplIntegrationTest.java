@@ -1,7 +1,18 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.app.Application;
 import android.content.Context;
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.room.Room;
@@ -17,7 +28,6 @@ import com.ibrahimekinci.barcrowd.data.local.LiveUpdateDao;
 import com.ibrahimekinci.barcrowd.data.local.LiveUpdateEntity;
 import com.ibrahimekinci.barcrowd.data.remote.FirestoreWrapper;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
-// import com.ibrahimekinci.barcrowd.util.ConnectivityUtil; // Removed
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +37,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-// import org.mockito.MockedStatic; // Removed
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -37,16 +46,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(AndroidJUnit4.class)
 public class LiveUpdateRepositoryImplIntegrationTest {

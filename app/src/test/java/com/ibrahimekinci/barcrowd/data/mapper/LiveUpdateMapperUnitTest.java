@@ -1,14 +1,17 @@
 package com.ibrahimekinci.barcrowd.data.mapper;
 
-import com.ibrahimekinci.barcrowd.data.local.LiveUpdateEntity;
-import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
-import com.google.firebase.Timestamp;
-import org.junit.Test;
-import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import com.google.firebase.Timestamp;
+import com.ibrahimekinci.barcrowd.data.local.LiveUpdateEntity;
+import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
+
+import org.junit.Test;
+
+import java.util.Date;
 
 public class LiveUpdateMapperUnitTest {
 

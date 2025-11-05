@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
+
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -107,6 +108,7 @@ public class StorageWrapper {
 
     public interface Callback<T> {
         void onSuccess(T result);
+
         void onFailure(StorageException e);
     }
 }

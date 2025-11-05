@@ -1,6 +1,7 @@
 package com.ibrahimekinci.barcrowd.di;
 
 import android.app.Application;
+
 import com.ibrahimekinci.barcrowd.BarCrowdApplication;
 import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
 import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
@@ -12,7 +13,20 @@ import com.ibrahimekinci.barcrowd.data.repository.UserRepository;
 import com.ibrahimekinci.barcrowd.data.repository.UserRepositoryImpl;
 import com.ibrahimekinci.barcrowd.data.repository.VenueRepository;
 import com.ibrahimekinci.barcrowd.data.repository.VenueRepositoryImpl;
-import com.ibrahimekinci.barcrowd.domain.usecase.*;
+import com.ibrahimekinci.barcrowd.domain.usecase.GetAllLiveUpdatesUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.GetAllVenuesUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.GetCurrentUserUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.GetHomePageVenuesUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.GetMyContributionsUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.GetRecentLiveUpdatesUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.GetUpdatesForVenueUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.GetVenueByIdUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.IsUserLoggedInUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.PostLiveUpdateUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.SearchVenuesUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.SignInUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.SignOutUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.SignUpUseCase;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 
 public class DependencyInjector {

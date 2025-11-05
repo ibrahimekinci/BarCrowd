@@ -1,9 +1,9 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper.AuthCallback;
 import com.ibrahimekinci.barcrowd.data.repository.UserRepository;
 import com.ibrahimekinci.barcrowd.util.ValidationException;
 import com.ibrahimekinci.barcrowd.util.Validators;
-import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper.AuthCallback;
 
 /**
  * Use case for signing up a user.

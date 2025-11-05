@@ -23,6 +23,7 @@ public class PostLiveUpdateUseCase {
 
     /**
      * Validates, enriches (with denormalized data), and posts a live update.
+     *
      * @param update The LiveUpdate object from the UI (may be missing venueName, etc.)
      * @throws ValidationException if any data is invalid.
      */

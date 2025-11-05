@@ -30,9 +30,9 @@ public class BarCrowdApplication extends Application {
         registerReceiver(new ConnectivityReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         // 4. Seed sample data
-            new Thread(() -> {
-                SampleDataSeeder.seedDatabase();
-            }).start();
+        new Thread(() -> {
+            SampleDataSeeder.seedDatabase();
+        }).start();
 
     }
 

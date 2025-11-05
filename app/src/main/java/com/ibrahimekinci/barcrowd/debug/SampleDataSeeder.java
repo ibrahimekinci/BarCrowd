@@ -1,11 +1,13 @@
 package com.ibrahimekinci.barcrowd.debug;
 
 import android.util.Log;
-import com.google.firebase.firestore.FirebaseFirestore;
+
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.Date;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utility class to seed Firestore with sample data for debugging.
@@ -20,16 +22,16 @@ public class SampleDataSeeder {
 
     // Using the new project links: barcrowd-5a1a9
     private static final String VENUE_1_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue1.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
-    private static final String VENUE_2_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue2.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
-    private static final String VENUE_3_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue3.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
-    private static final String VENUE_4_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue4.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
-    private static final String VENUE_5_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue5.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String VENUE_2_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue2.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
+    private static final String VENUE_3_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue3.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
+    private static final String VENUE_4_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue4.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
+    private static final String VENUE_5_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/venue5.jpg?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
 
-    private static final String UPDATE_1_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate1.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
-    private static final String UPDATE_2_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate2.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
-    private static final String UPDATE_3_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate3.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
-    private static final String UPDATE_4_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate4.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
-    private static final String UPDATE_5_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate5.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791"; 
+    private static final String UPDATE_1_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate1.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
+    private static final String UPDATE_2_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate2.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
+    private static final String UPDATE_3_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate3.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
+    private static final String UPDATE_4_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate4.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
+    private static final String UPDATE_5_URL = "https://firebasestorage.googleapis.com/v0/b/barcrowd-5a1a9.firebasestorage.app/o/liveupdate5.mp4?alt=media&token=82101155-79af-4c5f-a7aa-465d652e2791";
 
     // --- END OF LINKS ---
 
@@ -150,8 +152,12 @@ public class SampleDataSeeder {
             venue1.put("latitude", -37.8493);
             venue1.put("longitude", 144.9939);
             venue1.put("openingHours", new HashMap<String, String>() {{
-                put("Monday", "Closed"); put("Tuesday", "17:00–03:00"); put("Wednesday", "17:00–03:00");
-                put("Thursday", "17:00–05:00"); put("Friday", "17:00–07:00"); put("Saturday", "12:00–07:00");
+                put("Monday", "Closed");
+                put("Tuesday", "17:00–03:00");
+                put("Wednesday", "17:00–03:00");
+                put("Thursday", "17:00–05:00");
+                put("Friday", "17:00–07:00");
+                put("Saturday", "12:00–07:00");
                 put("Sunday", "12:00–01:00");
             }});
             venue1.put("averageCrowdLevel", "High");
@@ -174,8 +180,12 @@ public class SampleDataSeeder {
             venue2.put("latitude", -37.8105);
             venue2.put("longitude", 144.9654);
             venue2.put("openingHours", new HashMap<String, String>() {{
-                put("Monday", "12:00–01:00"); put("Tuesday", "12:00–01:00"); put("Wednesday", "12:00–01:00");
-                put("Thursday", "12:00–03:00"); put("Friday", "12:00–03:00"); put("Saturday", "12:00–03:00");
+                put("Monday", "12:00–01:00");
+                put("Tuesday", "12:00–01:00");
+                put("Wednesday", "12:00–01:00");
+                put("Thursday", "12:00–03:00");
+                put("Friday", "12:00–03:00");
+                put("Saturday", "12:00–03:00");
                 put("Sunday", "12:00–01:00");
             }});
             venue2.put("averageCrowdLevel", "Medium");
@@ -198,8 +208,12 @@ public class SampleDataSeeder {
             venue3.put("latitude", -37.8093);
             venue3.put("longitude", 144.9705);
             venue3.put("openingHours", new HashMap<String, String>() {{
-                put("Monday", "11:00–23:00"); put("Tuesday", "11:00–23:00"); put("Wednesday", "11:00–23:00");
-                put("Thursday", "11:00–00:00"); put("Friday", "11:00–01:00"); put("Saturday", "11:00–01:00");
+                put("Monday", "11:00–23:00");
+                put("Tuesday", "11:00–23:00");
+                put("Wednesday", "11:00–23:00");
+                put("Thursday", "11:00–00:00");
+                put("Friday", "11:00–01:00");
+                put("Saturday", "11:00–01:00");
                 put("Sunday", "11:00–23:00");
             }});
             venue3.put("averageCrowdLevel", "Low");
@@ -222,8 +236,12 @@ public class SampleDataSeeder {
             venue4.put("latitude", -37.8120);
             venue4.put("longitude", 144.9702);
             venue4.put("openingHours", new HashMap<String, String>() {{
-                put("Monday", "17:00–03:00"); put("Tuesday", "17:00–03:00"); put("Wednesday", "17:00–03:00");
-                put("Thursday", "17:00–05:00"); put("Friday", "17:00–05:00"); put("Saturday", "17:00–05:00");
+                put("Monday", "17:00–03:00");
+                put("Tuesday", "17:00–03:00");
+                put("Wednesday", "17:00–03:00");
+                put("Thursday", "17:00–05:00");
+                put("Friday", "17:00–05:00");
+                put("Saturday", "17:00–05:00");
                 put("Sunday", "17:00–03:00");
             }});
             venue4.put("averageCrowdLevel", "Medium");
@@ -246,8 +264,12 @@ public class SampleDataSeeder {
             venue5.put("latitude", -37.8082);
             venue5.put("longitude", 144.9839);
             venue5.put("openingHours", new HashMap<String, String>() {{
-                put("Monday", "Closed"); put("Tuesday", "Closed"); put("Wednesday", "Closed");
-                put("Thursday", "21:00–03:00"); put("Friday", "21:00–05:00"); put("Saturday", "21:00–05:00");
+                put("Monday", "Closed");
+                put("Tuesday", "Closed");
+                put("Wednesday", "Closed");
+                put("Thursday", "21:00–03:00");
+                put("Friday", "21:00–05:00");
+                put("Saturday", "21:00–05:00");
                 put("Sunday", "Closed");
             }});
             venue5.put("averageCrowdLevel", "High");

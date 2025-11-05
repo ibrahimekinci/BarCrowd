@@ -1,9 +1,18 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
 import com.ibrahimekinci.barcrowd.data.repository.UserRepository;
 import com.ibrahimekinci.barcrowd.util.ValidationException;
 import com.ibrahimekinci.barcrowd.util.Validators;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,14 +22,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(org.mockito.junit.MockitoJUnitRunner.class)
 public class SignUpUseCaseTest {

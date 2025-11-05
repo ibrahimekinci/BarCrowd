@@ -1,20 +1,24 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
 import com.ibrahimekinci.barcrowd.data.repository.LiveUpdateRepository;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoRule;
+
 import java.util.List;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GetAllLiveUpdatesUseCaseTest {

@@ -2,12 +2,14 @@ package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.SetOptions;
 import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
+import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper.AuthCallback;
 import com.ibrahimekinci.barcrowd.data.remote.FirestoreWrapper;
 import com.ibrahimekinci.barcrowd.domain.model.User;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
-import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper.AuthCallback;
 
 /**
  * Firebase-only implementation of UserRepository.
@@ -89,6 +91,25 @@ public class UserRepositoryImpl implements UserRepository { // No "abstract" or 
                 callback.onFailure(e);
             }
         });
+    }
+
+    // data/repository/UserRepositoryImpl.java
+    @Override
+    public void updateUser(User user, FirebaseAuthWrapper.AuthCallback callback) {
+        // We update the full object to ensure all local changes are saved.
+        // Use .set(user) instead of .update() if you also need to update local LiveData.
+        firestore.getDb().collection("Users").document(user.getUserId())
+                .set(user, SetOptions.merge()) // .merge() only updates fields in the object
+                .addOnSuccessListener(aVoid -> {
+                    AppLogger.i("User profile updated in Firestore: " + user.getUserId());
+                    // Re-fetch or update local LiveData
+                    currentUserData.postValue(user);
+                    callback.onSuccess(null); // Success, no FirebaseUser to return
+                })
+                .addOnFailureListener(e -> {
+                    AppLogger.e("User profile update failed", e);
+                    callback.onFailure(e);
+                });
     }
 
     @Override

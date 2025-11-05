@@ -1,10 +1,10 @@
 // SignInUseCase.java
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
+import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
 import com.ibrahimekinci.barcrowd.data.repository.UserRepository;
 import com.ibrahimekinci.barcrowd.util.ValidationException;
 import com.ibrahimekinci.barcrowd.util.Validators;
-import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
 
 /**
  * Use case for signing in a user with validation.

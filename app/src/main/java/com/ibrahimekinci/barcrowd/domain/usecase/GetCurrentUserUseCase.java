@@ -1,6 +1,7 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
-import androidx.lifecycle.LiveData; // <-- Import LiveData
+import androidx.lifecycle.LiveData;
+
 import com.ibrahimekinci.barcrowd.data.repository.UserRepository;
 import com.ibrahimekinci.barcrowd.domain.model.User;
 
@@ -16,6 +17,7 @@ public class GetCurrentUserUseCase {
 
     /**
      * Executes the use case.
+     *
      * @return A LiveData object that will hold the User.
      * The return type is LiveData<User>, not User.
      */

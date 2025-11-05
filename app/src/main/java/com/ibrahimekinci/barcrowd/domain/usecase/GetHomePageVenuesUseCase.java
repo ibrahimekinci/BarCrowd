@@ -1,8 +1,10 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
 import androidx.lifecycle.LiveData;
+
 import com.ibrahimekinci.barcrowd.data.repository.VenueRepository;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
+
 import java.util.List;
 
 /**

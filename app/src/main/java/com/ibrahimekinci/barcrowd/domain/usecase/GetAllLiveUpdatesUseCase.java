@@ -1,8 +1,10 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
 import androidx.lifecycle.LiveData;
+
 import com.ibrahimekinci.barcrowd.data.repository.LiveUpdateRepository;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
+
 import java.util.List;
 
 /**

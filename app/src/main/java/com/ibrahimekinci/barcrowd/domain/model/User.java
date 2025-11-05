@@ -2,7 +2,9 @@ package com.ibrahimekinci.barcrowd.domain.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
+
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 import com.google.firebase.firestore.ServerTimestamp;
@@ -38,7 +40,8 @@ public class User implements Parcelable {
     private Timestamp createdAt;
 
     // Public, no-argument constructor is required for Firestore
-    public User() {}
+    public User() {
+    }
 
     // --- Parcelable Implementation ---
 
@@ -88,27 +91,88 @@ public class User implements Parcelable {
 
     // --- Getters ---
 
-    public String getUserId() { return userId; }
-    @NonNull public String getFullName() { return fullName; }
-    @NonNull public String getUsername() { return username; }
-    @NonNull public String getEmail() { return email; }
-    public String getProfilePhotoUrl() { return profilePhotoUrl; }
-    public boolean isTrusted() { return isTrusted; }
-    public boolean isDeleted() { return isDeleted; }
-    public Timestamp getDeletedAt() { return deletedAt; }
-    public Timestamp getUpdatedAt() { return updatedAt; }
-    public Timestamp getCreatedAt() { return createdAt; }
+    public String getUserId() {
+        return userId;
+    }
+
+    @NonNull
+    public String getFullName() {
+        return fullName;
+    }
+
+    @NonNull
+    public String getUsername() {
+        return username;
+    }
+
+    @NonNull
+    public String getEmail() {
+        return email;
+    }
+
+    public String getProfilePhotoUrl() {
+        return profilePhotoUrl;
+    }
+
+    public boolean isTrusted() {
+        return isTrusted;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public Timestamp getDeletedAt() {
+        return deletedAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
 
     // --- Setters ---
 
-    public void setUserId(String userId) { this.userId = userId; }
-    public void setFullName(@NonNull String fullName) { this.fullName = fullName; }
-    public void setUsername(@NonNull String username) { this.username = username; }
-    public void setEmail(@NonNull String email) { this.email = email; }
-    public void setProfilePhotoUrl(String profilePhotoUrl) { this.profilePhotoUrl = profilePhotoUrl; }
-    public void setTrusted(boolean trusted) { isTrusted = trusted; }
-    public void setDeleted(boolean deleted) { isDeleted = deleted; }
-    public void setDeletedAt(Timestamp deletedAt) { this.deletedAt = deletedAt; }
-    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setFullName(@NonNull String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setUsername(@NonNull String username) {
+        this.username = username;
+    }
+
+    public void setEmail(@NonNull String email) {
+        this.email = email;
+    }
+
+    public void setProfilePhotoUrl(String profilePhotoUrl) {
+        this.profilePhotoUrl = profilePhotoUrl;
+    }
+
+    public void setTrusted(boolean trusted) {
+        isTrusted = trusted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public void setDeletedAt(Timestamp deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
 }

@@ -14,23 +14,64 @@ public class OpeningHoursEmbedded {
     private String ohSaturday;
     private String ohSunday;
 
-    public OpeningHoursEmbedded() {}
+    public OpeningHoursEmbedded() {
+    }
 
     // --- Getters ---
-    public String getOhMonday() { return ohMonday; }
-    public String getOhTuesday() { return ohTuesday; }
-    public String getOhWednesday() { return ohWednesday; }
-    public String getOhThursday() { return ohThursday; }
-    public String getOhFriday() { return ohFriday; }
-    public String getOhSaturday() { return ohSaturday; }
-    public String getOhSunday() { return ohSunday; }
+    public String getOhMonday() {
+        return ohMonday;
+    }
+
+    public String getOhTuesday() {
+        return ohTuesday;
+    }
+
+    public String getOhWednesday() {
+        return ohWednesday;
+    }
+
+    public String getOhThursday() {
+        return ohThursday;
+    }
+
+    public String getOhFriday() {
+        return ohFriday;
+    }
+
+    public String getOhSaturday() {
+        return ohSaturday;
+    }
+
+    public String getOhSunday() {
+        return ohSunday;
+    }
 
     // --- Setters ---
-    public void setOhMonday(String ohMonday) { this.ohMonday = ohMonday; }
-    public void setOhTuesday(String ohTuesday) { this.ohTuesday = ohTuesday; }
-    public void setOhWednesday(String ohWednesday) { this.ohWednesday = ohWednesday; }
-    public void setOhThursday(String ohThursday) { this.ohThursday = ohThursday; }
-    public void setOhFriday(String ohFriday) { this.ohFriday = ohFriday; }
-    public void setOhSaturday(String ohSaturday) { this.ohSaturday = ohSaturday; }
-    public void setOhSunday(String ohSunday) { this.ohSunday = ohSunday; }
+    public void setOhMonday(String ohMonday) {
+        this.ohMonday = ohMonday;
+    }
+
+    public void setOhTuesday(String ohTuesday) {
+        this.ohTuesday = ohTuesday;
+    }
+
+    public void setOhWednesday(String ohWednesday) {
+        this.ohWednesday = ohWednesday;
+    }
+
+    public void setOhThursday(String ohThursday) {
+        this.ohThursday = ohThursday;
+    }
+
+    public void setOhFriday(String ohFriday) {
+        this.ohFriday = ohFriday;
+    }
+
+    public void setOhSaturday(String ohSaturday) {
+        this.ohSaturday = ohSaturday;
+    }
+
+    public void setOhSunday(String ohSunday) {
+        this.ohSunday = ohSunday;
+    }
 }
