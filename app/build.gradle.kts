@@ -73,6 +73,10 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
 
+    // glide    
+    implementation(libs.glide)
+    annotationProcessor(libs.glide.compiler)
+
     // WorkManager
     implementation(libs.work.runtime)
 

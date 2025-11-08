@@ -19,7 +19,6 @@ public class GetAllLiveUpdatesUseCase {
     }
 
     public LiveData<List<LiveUpdate>> execute() {
-        // Calls the new repository method
         return repository.getAllLiveUpdates();
     }
 }

@@ -1,3 +1,43 @@
 <resources>
-    <string name="app_name">Bar Crowd</string>
+    <string name="app_name">BarCrowd</string>
+
+
+
+    <!-- Sign In / Sign Up -->
+    <string name="hint_full_name">Full Name</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="action_sign_in">Sign In</string>
+    <string name="action_go_to_sign_in">Already have an account? Sign In</string>
+    <string name="action_go_to_sign_up">Don\'t have an account? Sign Up</string>
+    <string name="app_logo">App Logo</string>
+    <string name="hint_sign_in">Sign In</string>
+    <string name="nav_menu_title_home">Home</string>
+    <string name="nav_menu_title_search">Search</string>
+    <string name="nav_menu_title_new_live_update">New Live Update</string>
+    <string name="nav_menu_title_account">Account</string>
+    <string name="drawer_menu_title_account">Account</string>
+    <string name="drawer_menu_title_my_profile">My Profile</string>
+    <string name="drawer_menu_title_support">Support</string>
+    <string name="drawer_menu_title_faqs">FAQs</string>
+    <string name="drawer_menu_title_privacy_policy">Privacy Policy</string>
+    <string name="drawer_menu_title_contact_support">Contact Support</string>
+    <string name="drawer_menu_title_system">System</string>
+    <string name="drawer_menu_title_logout">Logout</string>
+    <string name="drawer_menu_title_my_live_updates">My Live Updates</string>
+    <string name="venue_logo">Venue logo</string>
+    <string name="live_updates">Live Updates</string>
+    <string name="show_all">Show All</string>
+    <string name="venues">Venues</string>
+    <string name="signin">Sign In</string>
+    <string name="logout">Logout</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="faqs_help_center">FAQs / Help Center</string>
+    <string name="contact_support">Contact Support</string>
+    <string name="support_policies"><![CDATA[Support & Policies]]></string>
+    <string name="my_live_updates">My Live Updates</string>
+    <string name="my_profile">My Profile</string>
+    <string name="account">Account</string>
 </resources>

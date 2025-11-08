@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:title="@string/nav_menu_title_home" />
+
+    <item android:id="@+id/searchFragment"
+        android:icon="@drawable/ic_baseline_search_24"
+        android:title="@string/nav_menu_title_search" />
+
+    <item android:id="@+id/newLiveUpdateFragment"
+        android:icon="@drawable/ic_baseline_add_24"
+        android:title="@string/nav_menu_title_new_live_update" />
+
+    <item android:id="@+id/accountFragment"
+        android:icon="@drawable/ic_baseline_person_24"
+        android:title="@string/nav_menu_title_account" />
+</menu>

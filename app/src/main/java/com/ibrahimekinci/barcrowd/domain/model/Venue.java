@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class Venue implements Parcelable {
 
-    @DocumentId
+    //@DocumentId
     private String venueId;
 
     @NonNull

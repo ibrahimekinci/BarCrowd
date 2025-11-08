@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentId;
 import com.google.firebase.firestore.ServerTimestamp;
 
 /**
@@ -16,7 +15,7 @@ import com.google.firebase.firestore.ServerTimestamp;
  */
 public class LiveUpdate implements Parcelable {
 
-    @DocumentId
+    //@DocumentId
     private String updateId;
 
     @NonNull
@@ -247,7 +246,7 @@ public class LiveUpdate implements Parcelable {
         this.thumbnailUrl = thumbnailUrl;
     }
 
-    public void setDeleted(boolean deleted) {
+    public void setIsDeleted(boolean deleted) {
         isDeleted = deleted;
     }
 

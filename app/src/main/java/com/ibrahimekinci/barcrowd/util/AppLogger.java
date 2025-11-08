@@ -21,6 +21,10 @@ public class AppLogger {
         Log.w(TAG, message);
     }
 
+    public static void w(String message,Exception ex) {
+        Log.w(TAG, message, ex);
+    }
+
     public static void e(String message, Throwable t) {
         Log.e(TAG, message, t);
     }

@@ -62,7 +62,7 @@ public class LiveUpdateMapper {
         model.setDescription(entity.getDescription());
         model.setMediaUrl(entity.getMediaUrl());
         model.setThumbnailUrl(entity.getThumbnailUrl());
-        model.setDeleted(entity.isDeleted());
+        model.setIsDeleted(entity.isDeleted());
 
         // Convert Date to Timestamp
         model.setDeletedAt(entity.getDeletedAt() != null ? new Timestamp(entity.getDeletedAt()) : null);

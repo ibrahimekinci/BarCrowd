@@ -35,8 +35,10 @@ public class VenueRepositoryImpl implements VenueRepository {
         List<VenueEntity> entities = venues.stream()
                 .map(VenueMapper::toEntity)
                 .collect(Collectors.toList());
-        dao.insertAll(entities);
-        AppLogger.d("Inserted " + venues.size() + " venues locally");
+        new Thread(() -> {
+            dao.insertAll(entities);
+            AppLogger.d("Inserted " + venues.size() + " venues locally");
+        }).start();
     }
 
     @Override

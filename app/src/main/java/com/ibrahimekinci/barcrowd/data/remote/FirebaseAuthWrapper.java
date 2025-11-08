@@ -9,26 +9,47 @@ import com.ibrahimekinci.barcrowd.domain.model.User;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 import com.ibrahimekinci.barcrowd.util.AuthException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class FirebaseAuthWrapper {
 
     private final FirebaseAuth auth;
-    private final FirebaseFirestore firestore; // Add Firestore instance
+    private final FirebaseFirestore firestore;
+
+    // Callback for checking uniqueness
+    public interface CheckUniquenessCallback {
+        void onResult(boolean isUnique, Exception e);
+    }
+
+    // Callback for standard Auth operations
+    public interface AuthCallback {
+        void onSuccess(FirebaseUser user);
+
+        void onFailure(Exception e);
+    }
 
     public FirebaseAuthWrapper() {
         this.auth = FirebaseAuth.getInstance();
-        this.firestore = FirebaseFirestore.getInstance(); // Get Firestore instance
+        this.firestore = FirebaseFirestore.getInstance();
     }
 
     /**
-     * Signs up a new user with email and password.
-     * On success, it also creates their user document in the /Users collection.
-     *
-     * @param email    User's email
-     * @param password User's password
-     * @param callback Callback for success (with FirebaseUser) or failure
+     * Checks if an email is already registered in Firebase Auth.
+     * This is called *before* attempting to sign up.
+     */
+    public void checkEmailExists(String email, @NonNull CheckUniquenessCallback callback) {
+        auth.fetchSignInMethodsForEmail(email)
+                .addOnSuccessListener(result -> {
+                    boolean emailExists = result.getSignInMethods() != null && !result.getSignInMethods().isEmpty();
+                    callback.onResult(!emailExists, null);
+                })
+                .addOnFailureListener(e -> {
+                    // This could be a network error, etc.
+                    callback.onResult(false, e);
+                });
+    }
+
+    /**
+     * Signs up a new user (Auth) AND creates their user document (Firestore).
+     * This is now only called AFTER email and username checks have passed.
      */
     public void signUp(String email, String password, @NonNull String fullName, @NonNull String username, @NonNull AuthCallback callback) {
         auth.createUserWithEmailAndPassword(email, password)
@@ -36,10 +57,9 @@ public class FirebaseAuthWrapper {
                     AppLogger.i("Sign-up successful for " + email);
                     FirebaseUser firebaseUser = authResult.getUser();
                     if (firebaseUser != null) {
-                        // After auth user is created, create the user document in Firestore
+                        // Auth user created, now create the Firestore document
                         createNewUserDocument(firebaseUser, fullName, username, callback);
                     } else {
-                        // This should rarely happen, but handle it
                         callback.onFailure(new AuthException("Sign-up succeeded but user object is null."));
                     }
                 })
@@ -50,32 +70,16 @@ public class FirebaseAuthWrapper {
     }
 
     /**
-     * Creates the corresponding User document in the /Users collection
-     * after a successful sign-up.
+     * Creates the corresponding User document in the /Users collection.
      */
     private void createNewUserDocument(FirebaseUser firebaseUser, String fullName, String username, @NonNull AuthCallback callback) {
-        // Use a Map to set initial values.
-        // use a Map instead of the User POJO here to ensure @ServerTimestamp works.
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("userId", firebaseUser.getUid());
-        userData.put("fullName", fullName);
-        userData.put("username", username);
-        userData.put("email", firebaseUser.getEmail());
-        userData.put("profilePhotoUrl", null);
-        userData.put("isTrusted", false); // Default value
-        userData.put("isDeleted", false); // Default value
-        userData.put("deletedAt", null);
-        // createdAt and updatedAt will be set by @ServerTimestamp in the POJO
-        // or by Firestore Security Rules if defined.
-        // For a direct .set() call with a Map, we should add them manually if not using rules.
-        // Let's rely on the User model's @ServerTimestamp annotation.
-
         User newUser = new User();
         newUser.setUserId(firebaseUser.getUid());
         newUser.setFullName(fullName);
         newUser.setUsername(username);
         newUser.setEmail(firebaseUser.getEmail());
-        // All other fields will use their Java defaults (false, null)
+        // All other fields (isTrusted, isDeleted, etc.) will use their Java defaults (false, null)
+        // which matches your Firestore rules [cite: Your provided firestore.rules]
 
         firestore.collection("Users").document(firebaseUser.getUid()).set(newUser)
                 .addOnSuccessListener(aVoid -> {
@@ -85,20 +89,14 @@ public class FirebaseAuthWrapper {
                 .addOnFailureListener(e -> {
                     AppLogger.e("Failed to create user document", e);
                     // Critical error: User auth was created but their database entry failed.
-                    // We should delete the auth user to allow them to try again.
+                    // Delete the auth user to allow them to try again.
                     firebaseUser.delete();
                     callback.onFailure(new AuthException("Failed to save user profile: " + e.getMessage(), e));
                 });
     }
 
-
     /**
      * Signs in a user with email and password.
-     * This method NO LONGER interacts with the local database.
-     *
-     * @param email    User's email
-     * @param password User's password
-     * @param callback Callback for success (with FirebaseUser) or failure
      */
     public void signIn(String email, String password, @NonNull AuthCallback callback) {
         auth.signInWithEmailAndPassword(email, password)
@@ -112,12 +110,6 @@ public class FirebaseAuthWrapper {
                 });
     }
 
-    /**
-     * Gets the currently authenticated FirebaseUser.
-     * This method NO LONGER interacts with the local database.
-     *
-     * @return FirebaseUser object, or null if not signed in.
-     */
     public FirebaseUser getCurrentUser() {
         return auth.getCurrentUser();
     }
@@ -125,11 +117,5 @@ public class FirebaseAuthWrapper {
     public void signOut() {
         auth.signOut();
         AppLogger.i("User signed out");
-    }
-
-    public interface AuthCallback {
-        void onSuccess(FirebaseUser user);
-
-        void onFailure(Exception e);
     }
 }

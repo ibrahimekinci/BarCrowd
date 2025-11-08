@@ -1,5 +1,8 @@
 package com.ibrahimekinci.barcrowd.util;
 
+/**
+ * Represents an error that occurred during a remote authentication (Firebase Auth) process.
+ */
 public class AuthException extends Exception {
     public AuthException(String message) {
         super(message);

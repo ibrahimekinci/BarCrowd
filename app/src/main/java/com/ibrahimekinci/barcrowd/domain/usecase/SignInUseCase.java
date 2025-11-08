@@ -1,4 +1,3 @@
-// SignInUseCase.java
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
 import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
@@ -16,13 +15,24 @@ public class SignInUseCase {
         this.userRepository = userRepository;
     }
 
-    public void execute(String email, String password, FirebaseAuthWrapper.AuthCallback callback) throws ValidationException {
-        if (!Validators.isValidEmail(email)) {
-            throw new ValidationException("Invalid email format");
+    /**
+     * Executes the asynchronous sign-in flow.
+     */
+    public void execute(String email, String password, FirebaseAuthWrapper.AuthCallback callback) {
+        // --- 1. Synchronous Validation ---
+        try {
+            if (!Validators.isValidEmail(email)) {
+                throw new ValidationException("Invalid email format.");
+            }
+            if (password == null || password.isEmpty()) {
+                throw new ValidationException("Password cannot be empty.");
+            }
+        } catch (ValidationException e) {
+            callback.onFailure(e);
+            return;
         }
-        if (password == null || password.isEmpty()) {
-            throw new ValidationException("Password cannot be empty");
-        }
+
+        // --- 2. Proceed to Sign In ---
         userRepository.signIn(email, password, callback);
     }
 }

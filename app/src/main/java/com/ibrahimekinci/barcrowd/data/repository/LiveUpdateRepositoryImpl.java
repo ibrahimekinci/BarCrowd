@@ -7,6 +7,7 @@ import androidx.lifecycle.Transformations;
 
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.Query;
 import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
 import com.ibrahimekinci.barcrowd.data.local.LiveUpdateDao;
 import com.ibrahimekinci.barcrowd.data.local.LiveUpdateEntity;
@@ -115,6 +116,7 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
 
     @Override
     public LiveData<List<LiveUpdate>> getRecentLiveUpdates() {
+        syncRecentLiveUpdates();
         return Transformations.map(dao.getRecentLiveUpdates(), entities ->
                 entities.stream()
                         .map(LiveUpdateMapper::toModel)
@@ -124,6 +126,7 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
 
     @Override
     public LiveData<List<LiveUpdate>> getAllLiveUpdates() {
+
         return Transformations.map(dao.getAllLiveUpdates(), entities ->
                 entities.stream()
                         .map(LiveUpdateMapper::toModel)
@@ -163,5 +166,43 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
                     AppLogger.e("Firestore soft delete failed", e);
                     callback.onFailure(e);
                 });
+    }
+
+    /**
+     * Listens for the 20 most recent (non-deleted) updates from Firestore
+     * and saves them to the local Room database.
+     */
+    @Override
+    public void syncRecentLiveUpdates() {
+        // Create a query for the 100 most recent updates that are not deleted
+        Query recentUpdatesQuery = firestore.getDb().collection("LiveUpdates")
+                .whereEqualTo("isDeleted", false)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(100);
+
+        // Use the listenForChanges method from FirestoreWrapper
+        recentUpdatesQuery.addSnapshotListener((snapshots, e) -> {
+            if (e != null) {
+                AppLogger.e("syncRecentLiveUpdates listener failed", e);
+                return;
+            }
+            if (snapshots == null) return;
+
+            AppLogger.d("Snapshot received for LiveUpdates (changes: " + snapshots.getDocumentChanges().size() + ")");
+
+            new Thread(() -> { // Database operations on a background thread
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED || dc.getType() == DocumentChange.Type.MODIFIED) {
+                        LiveUpdate update = dc.getDocument().toObject(LiveUpdate.class);
+                        if (update != null) {
+                            LiveUpdateEntity entity = LiveUpdateMapper.toEntity(update);
+                            entity.setSyncStatus(true); // It came from remote, so it's synced
+                            dao.insert(entity);
+                        }
+                    }
+                    // TODO: Handle DocumentChange.
+                }
+            }).start();
+        });
     }
 }

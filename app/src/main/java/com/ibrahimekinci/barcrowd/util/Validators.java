@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 public class Validators {
 
     // --- Allowed Value Sets (from Schema) ---
-    // Note: These are case-sensitive
     private static final Set<String> CROWD_LEVELS = new HashSet<>(
             Arrays.asList("Low", "Medium", "High")
     );
@@ -20,22 +19,39 @@ public class Validators {
     private static final Set<String> AGE_RANGES = new HashSet<>(
             Arrays.asList("18–21", "21–24", "25–30", "30–35", "35+")
     );
-    // --- End Allowed Values ---
 
+    // --- Patterns ---
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE
     );
-    private static final int NAME_MAX_LENGTH = 50;
+
+    // UPDATED: Pattern to only allow letters and spaces for full name
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z ]+$");
+
+    private static final int NAME_MAX_LENGTH = 50; // As specified in original file
+    private static final int USERNAME_MIN_LENGTH = 3;
+    private static final int USERNAME_MAX_LENGTH = 30; // From your firestore.rules
 
     public static boolean isValidEmail(String email) {
         return email != null && EMAIL_PATTERN.matcher(email).matches();
     }
 
     /**
-     * Checks for a valid name.
+     * Checks for a valid name. (Letters and spaces only)
      */
     public static boolean isValidName(String name) {
-        return name != null && !name.trim().isEmpty() && name.length() <= NAME_MAX_LENGTH;
+        return name != null && !name.trim().isEmpty()
+                && name.length() <= NAME_MAX_LENGTH
+                && NAME_PATTERN.matcher(name).matches();
+    }
+
+    /**
+     * Checks for a valid username. (Length 3-30)
+     */
+    public static boolean isValidUsername(String username) {
+        return username != null && !username.trim().isEmpty()
+                && username.length() >= USERNAME_MIN_LENGTH
+                && username.length() <= USERNAME_MAX_LENGTH;
     }
 
     public static boolean isValidPassword(String password) {
@@ -45,23 +61,14 @@ public class Validators {
                 && password.matches(".*[0-9].*");
     }
 
-    /**
-     * Validates against the exact allowed strings from the schema.
-     */
     public static boolean isValidAgeRange(String ageRange) {
         return ageRange != null && AGE_RANGES.contains(ageRange);
     }
 
-    /**
-     * Validates against the exact allowed strings from the schema.
-     */
     public static boolean isValidCrowdLevel(String crowdLevel) {
         return crowdLevel != null && CROWD_LEVELS.contains(crowdLevel);
     }
 
-    /**
-     * Validates against the exact allowed strings from the schema.
-     */
     public static boolean isValidWaitTime(String waitTime) {
         return waitTime != null && WAIT_TIMES.contains(waitTime);
     }

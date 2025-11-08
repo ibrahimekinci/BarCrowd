@@ -15,7 +15,7 @@ import com.google.firebase.firestore.ServerTimestamp;
  */
 public class User implements Parcelable {
 
-    @DocumentId
+   // @DocumentId
     private String userId;
 
     @NonNull
@@ -160,7 +160,7 @@ public class User implements Parcelable {
         isTrusted = trusted;
     }
 
-    public void setDeleted(boolean deleted) {
+    public void setIsDeleted(boolean deleted) {
         isDeleted = deleted;
     }
 

@@ -29,4 +29,5 @@ public interface LiveUpdateRepository {
     LiveData<List<LiveUpdate>> getAllLiveUpdates();
 
     void softDeleteUpdate(LiveUpdate update, FirestoreWrapper.Callback<Void> callback);
+    void syncRecentLiveUpdates();
 }
