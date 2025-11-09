@@ -35,7 +35,10 @@ public class AccountFragment extends Fragment {
     private View cardMyUpdates;
     private View cardLogout;
     private View cardLogin;
-    // Add views for Contact Support, FAQ, Privacy Policy...
+
+    private View navContactSupport;
+    private View navFaqs;
+    private View navPrivacy;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -58,12 +61,18 @@ public class AccountFragment extends Fragment {
 
         // --- 2. Find Views ---
         navController = Navigation.findNavController(view);
-        // Note: These IDs must exist in fragment_account.xml
+        
         cardMyProfile = view.findViewById(R.id.card_my_profile);
         cardMyUpdates = view.findViewById(R.id.card_my_updates);
 
         cardLogin = view.findViewById(R.id.nav_login);
         cardLogout = view.findViewById(R.id.nav_logout);
+
+        navContactSupport = view.findViewById(R.id.nav_contact_support);
+        navFaqs = view.findViewById(R.id.nav_faqs);
+        navPrivacy = view.findViewById(R.id.nav_privacy);
+
+
         if (isUserLoggedInUseCase.execute()) {
             cardLogin.setVisibility(View.GONE);
             cardLogout.setVisibility(View.VISIBLE);
@@ -89,16 +98,37 @@ public class AccountFragment extends Fragment {
         // Example navigation (You need to create these Fragments and actions in nav_graph.xml)
         if (cardMyProfile != null) {
             cardMyProfile.setOnClickListener(v -> {
+                // TODO: Uncomment when ProfileFragment is created
                 // navController.navigate(R.id.action_accountFragment_to_profileFragment);
                 AppLogger.d("My Profile clicked. Navigation not implemented yet.");
             });
         }
         if (cardMyUpdates != null) {
             cardMyUpdates.setOnClickListener(v -> {
+                // TODO: Uncomment when MyUpdatesFragment is created
                 // navController.navigate(R.id.action_accountFragment_to_myUpdatesFragment);
                 AppLogger.d("My Updates clicked. Navigation not implemented yet.");
             });
         }
+
+        if (navContactSupport != null) {
+            navContactSupport.setOnClickListener(v -> {
+                navController.navigate(R.id.action_accountFragment_to_contactSupportFragment);
+            });
+        }
+
+        if (navFaqs != null) {
+            navFaqs.setOnClickListener(v -> {
+                navController.navigate(R.id.action_accountFragment_to_helpCenterFragment);
+            });
+        }
+
+        if (navPrivacy != null) {
+            navPrivacy.setOnClickListener(v -> {
+                navController.navigate(R.id.action_accountFragment_to_privacyPolicyFragment);
+            });
+        }
+        // -----------------------
     }
 
     /**

@@ -29,6 +29,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BarCrowd">
+
+        <!--
+        ADD YOUR GOOGLE MAPS API KEY HERE
+        This is required for the MapView in VenueDetailsFragment to work.
+       -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="YOUR_API_KEY_HERE" />
+
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="true">

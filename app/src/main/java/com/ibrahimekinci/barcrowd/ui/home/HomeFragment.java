@@ -16,8 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ibrahimekinci.barcrowd.BarCrowdApplication;
 import com.ibrahimekinci.barcrowd.R;
 import com.ibrahimekinci.barcrowd.di.DependencyInjector;
+import com.ibrahimekinci.barcrowd.domain.model.Venue; // ADDED
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements VenueAdapter.OnVenueClickListener {
 
     private HomeViewModel viewModel;
     private NavController navController;
@@ -46,6 +47,7 @@ public class HomeFragment extends Fragment {
         // --- 2. Find Views ---
         navController = Navigation.findNavController(view);
         Button btnShowAllUpdates = view.findViewById(R.id.btn_show_all_updates);
+        Button btnShowAllVenues = view.findViewById(R.id.btn_show_all_venues); // ADDED THIS LINE
 
         // --- 3. Setup RecyclerViews ---
         setupLiveUpdatesRecyclerView(view);
@@ -57,8 +59,13 @@ public class HomeFragment extends Fragment {
         // --- 5. Setup Listeners ---
         btnShowAllUpdates.setOnClickListener(v -> {
             // TODO: Navigate to the "YouTube Shorts" style feed
-            // This action needs to be added to nav_graph.xml
+            // TODO: This action needs to be added to nav_graph.xml
             // navController.navigate(R.id.action_homeFragment_to_liveUpdateFeedFragment);
+        });
+
+        btnShowAllVenues.setOnClickListener(v -> {
+            // Navigate to the new AllVenuesFragment
+            navController.navigate(R.id.action_homeFragment_to_allVenuesFragment);
         });
     }
 
@@ -74,7 +81,7 @@ public class HomeFragment extends Fragment {
         RecyclerView rvVenues = view.findViewById(R.id.rv_venues);
         // Use a vertical layout manager
         rvVenues.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        venueAdapter = new VenueAdapter();
+        venueAdapter = new VenueAdapter(this);
         rvVenues.setAdapter(venueAdapter);
     }
 
@@ -92,5 +99,12 @@ public class HomeFragment extends Fragment {
                 liveUpdateAdapter.submitList(updates);
             }
         });
+    }
+    @Override
+    public void onVenueClick(Venue venue) {
+        // Navigate to VenueDetailsFragment using the generated SafeArgs class
+        HomeFragmentDirections.ActionHomeFragmentToVenueDetailsFragment action =
+                HomeFragmentDirections.actionHomeFragmentToVenueDetailsFragment(venue.getVenueId());
+        navController.navigate(action);
     }
 }

@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">BarCrowd</string>
 
-
-
     <!-- Sign In / Sign Up -->
     <string name="hint_full_name">Full Name</string>
     <string name="hint_username">Username</string>
@@ -40,4 +38,71 @@
     <string name="my_live_updates">My Live Updates</string>
     <string name="my_profile">My Profile</string>
     <string name="account">Account</string>
+
+    <!-- Static Info Pages -->
+    <string name="title_contact_support">Contact Support</string>
+    <string name="title_privacy_policy">Privacy Policy</string>
+    <string name="title_help_center">Help Center</string>
+
+    <!-- Contact Support Page -->
+    <string name="contact_email_header">Email</string>
+    <string name="contact_email_address">support@barcrowd.app</string>
+    <string name="contact_email_response">We usually reply within 24 hours.</string>
+    <string name="contact_phone_header">Phone</string>
+    <string name="contact_phone_number">+61 3 9000 0000</string>
+    <string name="contact_address_header">Address</string>
+    <string name="contact_address_details">123 Bourke St, Melbourne VIC 3000</string>
+    <string name="contact_hours_header">Opening Hours</string>
+    <string name="contact_hours_details">Mon - Fri, 9:00 AM - 5:00 PM</string>
+
+    <!-- Privacy Policy Page -->
+    <string name="privacy_title_welcome">Welcome to BarCrowd</string>
+    <string name="privacy_last_updated">Last updated: 1 November 2025</string>
+    <string name="privacy_intro">Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your information when you use the BarCrowd application.</string>
+    <string name="privacy_title_collection">Information We Collect</string>
+    <string name="privacy_collection_body">
+        <b>Personal Information:</b> Your name, email address, and profile picture (if provided). Account credentials.\n
+        <b>Usage Information:</b> Venues you view or interact with, content you upload (photos, videos, crowd data).\n
+        <b>Location Data:</b> We only collect your location if you explicitly grant permission, which is required to tag your live updates accurately.
+    </string>
+    <string name="privacy_title_usage">How We Use Your Information</string>
+    <string name="privacy_usage_body">
+        - To provide and improve app features.\n
+        - To display your crowd updates to other users.\n
+        - To personalize your experience.\n
+        - To analyze app usage and trends to improve our service.
+    </string>
+    <string name="privacy_title_ugc">User-Submitted Content</string>
+    <string name="privacy_ugc_body">When you upload a crowd update (photo or video), your content, username, and the time of submission may be visible to other users of the app. By submitting content, you grant BarCrowd a license to display it.</string>
+
+    <!-- Help Center (FAQ) Page -->
+    <string name="faq_q1">What is BarCrowd?</string>
+    <string name="faq_a1">BarCrowd is a mobile app that lets users check real-time crowd levels at bars and clubs through photos and videos shared by other users.</string>
+    <string name="faq_q2">What does "Crowd Level" mean?</string>
+    <string name="faq_a2">
+        <b>Low:</b> Mostly empty or very few people. Plenty of space, no wait at the bar.\n
+        <b>Medium:</b> Moderately busy, but not packed. Still easy to move around.\n
+        <b>High:</b> Very busy or packed. Hard to find space, possible wait time to enter.
+    </string>
+    <string name="faq_q3">How do I upload a crowd update?</string>
+    <string name="faq_a3">Tap the "New Live Update" icon on the bottom navigation bar. Select a venue, capture or upload a photo/video, set the crowd level, wait time, and age range, then tap "Publish Update".</string>
+    <string name="faq_q4">Can I delete an update I posted?</string>
+    <string name="faq_a4">Yes. Go to Account > My Live Updates. You will find a list of your contributions with an option to delete them.</string>
+    <string name="faq_q5">How do I contact support?</string>
+    <string name="faq_a5">For help or account-related questions, please email us at support@barcrowd.app. We typically respond within 24-48 hours.</string>
+
+    <!-- All Venues Page -->
+    <string name="title_all_venues">All Venues</string>
+
+    <!-- Venue Details Page -->
+    <string name="title_venue_details">Venue Details</string>
+    <string name="details_current_stats">Current stats</string>
+    <string name="details_venue_info">Venue Info</string>
+    <string name="details_address">Address</string>
+    <string name="details_last_updated">Last updated: %s</string>
+    <string name="details_last_updated_na">Last updated: N/A</string>
+    <string name="details_map_placeholder">address</string>
+    <string name="details_opening_hours">Opening Hours</string>
+    <string name="details_add_new_update">Add new live update</string>
+
 </resources>

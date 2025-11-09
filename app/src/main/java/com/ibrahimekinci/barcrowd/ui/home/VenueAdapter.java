@@ -14,14 +14,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.ibrahimekinci.barcrowd.R;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
-// import com.bumptech.glide.Glide; // Glide gibi bir kütüphane kullanıyorsanız ekleyin
 
 public class VenueAdapter extends ListAdapter<Venue, VenueAdapter.VenueViewHolder> {
 
-    public VenueAdapter() {
-        super(DIFF_CALLBACK);
+    public interface OnVenueClickListener {
+        void onVenueClick(Venue venue);
     }
 
+    private final OnVenueClickListener clickListener;
+    public VenueAdapter(OnVenueClickListener clickListener) {
+        super(DIFF_CALLBACK);
+        this.clickListener = clickListener;
+    }
     private static final DiffUtil.ItemCallback<Venue> DIFF_CALLBACK = new DiffUtil.ItemCallback<Venue>() {
         @Override
         public boolean areItemsTheSame(@NonNull Venue oldItem, @NonNull Venue newItem) {
@@ -40,7 +44,7 @@ public class VenueAdapter extends ListAdapter<Venue, VenueAdapter.VenueViewHolde
     public VenueViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_venue_card, parent, false);
-        return new VenueViewHolder(view);
+        return new VenueViewHolder(view, clickListener);
     }
 
     @Override
@@ -49,15 +53,17 @@ public class VenueAdapter extends ListAdapter<Venue, VenueAdapter.VenueViewHolde
         holder.bind(venue);
     }
 
-    class VenueViewHolder extends RecyclerView.ViewHolder {
+    static class VenueViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivVenueLogo;
         private final TextView tvVenueName;
         private final TextView tvLastCrowdLevel;
         private final TextView tvLastWaitTime;
         private final TextView tvLastAgeGroup;
+        private final OnVenueClickListener clickListener; // Added
 
-        public VenueViewHolder(@NonNull View itemView) {
+        public VenueViewHolder(@NonNull View itemView, OnVenueClickListener clickListener) { // Updated
             super(itemView);
+            this.clickListener = clickListener; // Added
             ivVenueLogo = itemView.findViewById(R.id.iv_venue_logo);
             tvVenueName = itemView.findViewById(R.id.tv_venue_name);
             tvLastCrowdLevel = itemView.findViewById(R.id.tv_last_crowd_level);
@@ -68,7 +74,7 @@ public class VenueAdapter extends ListAdapter<Venue, VenueAdapter.VenueViewHolde
         public void bind(Venue venue) {
             tvVenueName.setText(venue.getName());
             tvLastCrowdLevel.setText(venue.getLastCrowdLevel());
-            tvLastWaitTime.setText(venue.getLastWaitTime()); 
+            tvLastWaitTime.setText(venue.getLastWaitTime());
             tvLastAgeGroup.setText(venue.getMostPopulousAge());
 
             Glide.with(itemView.getContext())
@@ -77,6 +83,13 @@ public class VenueAdapter extends ListAdapter<Venue, VenueAdapter.VenueViewHolde
                     .error(R.drawable.venue_placeholder)
                     .centerCrop()
                     .into(ivVenueLogo);
+
+            // Set the click listener for the entire item
+            itemView.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onVenueClick(venue);
+                }
+            });
         }
     }
 }

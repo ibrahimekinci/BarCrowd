@@ -18,6 +18,9 @@
         <action
             android:id="@+id/action_homeFragment_to_venueDetailsFragment"
             app:destination="@id/venueDetailsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_allVenuesFragment"
+            app:destination="@id/allVenuesFragment" />
 
     </fragment>
 
@@ -48,6 +51,15 @@
             app:destination="@id/signInFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_accountFragment_to_contactSupportFragment"
+            app:destination="@id/contactSupportFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_helpCenterFragment"
+            app:destination="@id/helpCenterFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_privacyPolicyFragment"
+            app:destination="@id/privacyPolicyFragment" />
     </fragment>
 
     <fragment
@@ -97,13 +109,40 @@
 
     <fragment
         android:id="@+id/venueDetailsFragment"
-        android:name="com.ibrahimekinci.barcrowd.ui.details.VenueDetailsFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.venues.VenueDetailsFragment"
         android:label="fragment_venue_details"
         tools:layout="@layout/fragment_venue_details">
 
         <argument
             android:name="venueId"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contactSupportFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.info.ContactSupportFragment"
+        android:label="fragment_contact_support"
+        tools:layout="@layout/fragment_contact_support" />
+    <fragment
+        android:id="@+id/privacyPolicyFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.info.PrivacyPolicyFragment"
+        android:label="fragment_privacy_policy"
+        tools:layout="@layout/fragment_privacy_policy" />
+    <fragment
+        android:id="@+id/helpCenterFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.info.HelpCenterFragment"
+        android:label="fragment_help_center"
+        tools:layout="@layout/fragment_help_center" />
+
+    <fragment
+        android:id="@+id/allVenuesFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.venues.AllVenuesFragment"
+        android:label="fragment_all_venues"
+        tools:layout="@layout/fragment_all_venues" >
+
+        <action
+            android:id="@+id/action_allVenuesFragment_to_venueDetailsFragment"
+            app:destination="@id/venueDetailsFragment" />
     </fragment>
 
 </navigation>

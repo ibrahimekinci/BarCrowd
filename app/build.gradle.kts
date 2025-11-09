@@ -60,6 +60,7 @@ dependencies {
 
     // Jetpack Room
     implementation(libs.room.runtime)
+    implementation(libs.play.services.maps)
     annotationProcessor(libs.room.compiler)
 
     // Firebase
@@ -76,6 +77,8 @@ dependencies {
     // glide    
     implementation(libs.glide)
     annotationProcessor(libs.glide.compiler)
+
+    implementation(libs.play.services.maps)
 
     // WorkManager
     implementation(libs.work.runtime)
