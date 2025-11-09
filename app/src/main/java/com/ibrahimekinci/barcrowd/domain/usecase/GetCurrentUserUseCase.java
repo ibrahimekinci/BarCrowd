@@ -21,7 +21,7 @@ public class GetCurrentUserUseCase {
      * @return A LiveData object that will hold the User.
      * The return type is LiveData<User>, not User.
      */
-    public LiveData<User> execute() { // <-- FIX: Return type changed to LiveData<User>
+    public LiveData<User> execute() {
         return userRepository.getCurrentUser();
     }
 }

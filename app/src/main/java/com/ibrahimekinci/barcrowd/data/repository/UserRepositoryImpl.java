@@ -1,5 +1,6 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,6 +25,7 @@ public class UserRepositoryImpl implements UserRepository {
         this.authWrapper = authWrapper;
         this.db = firestore.getDb(); // Get instance from wrapper
 
+        // Fetch data in constructor (for app startup)
         if (isUserLoggedIn()) {
             fetchUserDocument(authWrapper.getCurrentUser().getUid());
         }
@@ -58,8 +60,34 @@ public class UserRepositoryImpl implements UserRepository {
                 });
     }
 
+    /**
+     * Checks if the username is taken by any user *other than* the one specified by userId.
+     */
+    @Override
+    public void checkUsernameForUpdate(String username, String userId, UniquenessCallback callback) {
+        db.collection("Users")
+                .whereEqualTo("username", username)
+                .whereNotEqualTo("userId", userId) // Key difference: "userId" field (per your model)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    // if snapshot is empty, the username is unique (or only belongs to the current user)
+                    callback.onResult(snapshot.isEmpty(), null);
+                })
+                .addOnFailureListener(e -> {
+                    // Query failed (e.g., network error)
+                    callback.onResult(false, e);
+                });
+    }
+
     @Override
     public LiveData<User> getCurrentUser() {
+        // If user is logged in BUT data hasn't (asynchronously) arrived yet,
+        // (ProfileFragment opening immediately) re-trigger the fetch.
+        if (isUserLoggedIn() && currentUserData.getValue() == null) {
+            AppLogger.d("UserRepository: User is logged in but data is null. Triggering fetch.");
+            fetchUserDocument(authWrapper.getCurrentUser().getUid());
+        }
         return currentUserData;
     }
 
@@ -72,7 +100,8 @@ public class UserRepositoryImpl implements UserRepository {
                             currentUserData.postValue(user);
                             AppLogger.i("User document fetched: " + user.getUsername());
                         } else {
-                            AppLogger.e("User document exists but failed to map to User.class");
+                            // Mapping error log
+                            AppLogger.e("User document exists but failed to map to User.class. Check User.java and Firestore field names (e.g., 'isDeleted' vs 'deleted').");
                             currentUserData.postValue(null);
                         }
                     } else {
@@ -85,11 +114,6 @@ public class UserRepositoryImpl implements UserRepository {
                     currentUserData.postValue(null);
                 });
     }
-
-    /**
-     * UPDATED signUp method.
-     * It now performs an email uniqueness check *before* attempting to create the user.
-     */
     @Override
     public void signUp(String email, String password, String fullName, String username, FirebaseAuthWrapper.AuthCallback callback) {
         // Step 1: Check if email is unique
@@ -129,6 +153,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .set(user, SetOptions.merge()) // .merge() only updates fields
                 .addOnSuccessListener(aVoid -> {
                     AppLogger.i("User profile updated in Firestore: " + user.getUserId());
+                    // Also update the LiveData locally (no need to re-fetch)
                     currentUserData.postValue(user);
                     callback.onSuccess(null); // Success, no FirebaseUser to return
                 })

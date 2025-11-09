@@ -104,5 +104,11 @@
     <string name="details_map_placeholder">address</string>
     <string name="details_opening_hours">Opening Hours</string>
     <string name="details_add_new_update">Add new live update</string>
+    <string name="profile_error_loading">Loading</string>
+    <string name="profile_updated_success">Profile has been updated</string>
+    <string name="profile_update_failed">Profile update has been failed. Please try again. %s</string>
+    <string name="profile_update">Update</string>
+    <string name="profile_change_photo">Change the photo</string>
+    <string name="title_my_profile">Profile</string>
 
 </resources>

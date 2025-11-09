@@ -27,6 +27,7 @@ import com.ibrahimekinci.barcrowd.domain.usecase.SearchVenuesUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.SignInUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.SignOutUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.SignUpUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.UpdateUserUseCase;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 
 public class DependencyInjector {
@@ -90,6 +91,10 @@ public class DependencyInjector {
 
     public GetCurrentUserUseCase getGetCurrentUserUseCase() {
         return new GetCurrentUserUseCase(getUserRepository());
+    }
+
+    public UpdateUserUseCase getUpdateUserUseCase() {
+        return new UpdateUserUseCase(getUserRepository());
     }
 
     public GetHomePageVenuesUseCase getGetHomePageVenuesUseCase() {

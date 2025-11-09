@@ -26,6 +26,14 @@ public interface UserRepository {
     void checkEmailExists(String email, UniquenessCallback callback);
 
     /**
+     * Checks if a username is taken by *another* user.
+     * @param username The username to check.
+     * @param userId The ID of the *current* user (to exclude them from the search).
+     * @param callback Returns true if unique, false otherwise.
+     */
+    void checkUsernameForUpdate(String username, String userId, UniquenessCallback callback);
+
+    /**
      * Gets the currently authenticated user's data from Firestore.
      */
     LiveData<User> getCurrentUser();

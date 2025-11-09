@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.PropertyName;
 import com.google.firebase.firestore.ServerTimestamp;
 
 /**
@@ -15,7 +15,7 @@ import com.google.firebase.firestore.ServerTimestamp;
  */
 public class User implements Parcelable {
 
-   // @DocumentId
+    // @DocumentId
     private String userId;
 
     @NonNull
@@ -28,8 +28,7 @@ public class User implements Parcelable {
     private String email;
 
     private String profilePhotoUrl; // Not required, default is null
-
-    private boolean isTrusted = false; // Default value from schema
+    private boolean isTrusted = false;
     private boolean isDeleted = false; // Default value from schema
     private Timestamp deletedAt = null; // Default value from schema
 
@@ -114,10 +113,12 @@ public class User implements Parcelable {
         return profilePhotoUrl;
     }
 
+    @PropertyName("isTrusted")
     public boolean isTrusted() {
         return isTrusted;
     }
 
+    @PropertyName("isDeleted")
     public boolean isDeleted() {
         return isDeleted;
     }
@@ -156,12 +157,22 @@ public class User implements Parcelable {
         this.profilePhotoUrl = profilePhotoUrl;
     }
 
-    public void setTrusted(boolean trusted) {
+    @PropertyName("isTrusted")
+    public void setIsTrusted(boolean trusted) {
         isTrusted = trusted;
     }
 
+    public void setTrusted(boolean trusted) {
+        this.isTrusted = trusted;
+    }
+
+    @PropertyName("isDeleted")
     public void setIsDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.isDeleted = deleted;
     }
 
     public void setDeletedAt(Timestamp deletedAt) {

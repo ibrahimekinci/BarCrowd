@@ -40,6 +40,8 @@ public class AccountFragment extends Fragment {
     private View navFaqs;
     private View navPrivacy;
 
+    private boolean isUserLoggedIn;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,7 +63,7 @@ public class AccountFragment extends Fragment {
 
         // --- 2. Find Views ---
         navController = Navigation.findNavController(view);
-        
+
         cardMyProfile = view.findViewById(R.id.card_my_profile);
         cardMyUpdates = view.findViewById(R.id.card_my_updates);
 
@@ -72,8 +74,8 @@ public class AccountFragment extends Fragment {
         navFaqs = view.findViewById(R.id.nav_faqs);
         navPrivacy = view.findViewById(R.id.nav_privacy);
 
-
-        if (isUserLoggedInUseCase.execute()) {
+        isUserLoggedIn = isUserLoggedInUseCase.execute();
+        if (isUserLoggedIn) {
             cardLogin.setVisibility(View.GONE);
             cardLogout.setVisibility(View.VISIBLE);
         } else {
@@ -94,20 +96,30 @@ public class AccountFragment extends Fragment {
             });
         }
 
-
-        // Example navigation (You need to create these Fragments and actions in nav_graph.xml)
         if (cardMyProfile != null) {
             cardMyProfile.setOnClickListener(v -> {
-                // TODO: Uncomment when ProfileFragment is created
-                // navController.navigate(R.id.action_accountFragment_to_profileFragment);
-                AppLogger.d("My Profile clicked. Navigation not implemented yet.");
+                // Check if user is logged in before navigating
+                if (isUserLoggedIn) {
+                    // User is logged in, go to profile
+                    navController.navigate(R.id.action_accountFragment_to_profileFragment);
+                } else {
+                    // User is not logged in, go to sign in
+                    navController.navigate(R.id.action_accountFragment_to_signInFragment);
+                }
             });
         }
+
         if (cardMyUpdates != null) {
             cardMyUpdates.setOnClickListener(v -> {
-                // TODO: Uncomment when MyUpdatesFragment is created
-                // navController.navigate(R.id.action_accountFragment_to_myUpdatesFragment);
-                AppLogger.d("My Updates clicked. Navigation not implemented yet.");
+                // Check if user is logged in before navigating
+                if (isUserLoggedIn) {
+                    // TODO: Uncomment when MyUpdatesFragment is created
+                    // navController.navigate(R.id.action_accountFragment_to_myUpdatesFragment);
+                    AppLogger.d("My Updates clicked. Navigation not implemented yet.");
+                } else {
+                    // User is not logged in, go to sign in
+                    navController.navigate(R.id.action_accountFragment_to_signInFragment);
+                }
             });
         }
 
