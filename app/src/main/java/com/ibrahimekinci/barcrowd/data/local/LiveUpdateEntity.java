@@ -35,10 +35,10 @@ public class LiveUpdateEntity {
     private String venueLogoUrl;
 
     // Timestamps
-    private Date updatedAt; // Use java.util.Date
-    private Date createdAt; // Use java.util.Date
+    private Date updatedAt;
+    private Date createdAt;
 
-    private boolean syncStatus; // false if pending sync
+    private boolean syncStatus;
 
     public LiveUpdateEntity() {
     }

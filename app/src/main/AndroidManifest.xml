@@ -30,13 +30,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BarCrowd">
 
-        <!--
-        ADD YOUR GOOGLE MAPS API KEY HERE
-        This is required for the MapView in VenueDetailsFragment to work.
-       -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY_HERE" />
+            android:value="@string/google_maps_key" />
 
         <activity
             android:name=".ui.activity.MainActivity"

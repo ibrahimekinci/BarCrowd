@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
+//import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -47,7 +47,7 @@ public class VenueDetailsFragment extends Fragment implements OnMapReadyCallback
     private String venueId;
 
     // Views
-    private MapView mapView;
+    //private MapView mapView;
     private GoogleMap googleMap;
     private ImageView ivVenueLogo;
     private TextView tvVenueName, tvVenueType, tvCrowdLevel, tvWaitTime, tvAgeRange, tvUpdatedAt, tvAddress, tvOpeningHours;
@@ -97,9 +97,9 @@ public class VenueDetailsFragment extends Fragment implements OnMapReadyCallback
 
         // --- 5. Setup MapView ---
         // IMPORTANT: Handle MapView lifecycle
-        savedMapState = (savedInstanceState != null) ? savedInstanceState.getBundle("mapViewSaveState") : null;
-        mapView.onCreate(savedMapState);
-        mapView.getMapAsync(this); // Triggers onMapReady
+        //savedMapState = (savedInstanceState != null) ? savedInstanceState.getBundle("mapViewSaveState") : null;
+        //mapView.onCreate(savedMapState);
+        //mapView.getMapAsync(this); // Triggers onMapReady
 
         // --- 6. Observe ViewModel ---
         observeViewModel();
@@ -252,44 +252,44 @@ public class VenueDetailsFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+        //mapView.onResume();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        mapView.onStart();
+       // mapView.onStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mapView.onStop();
+        //mapView.onStop();
     }
 
     @Override
     public void onPause() {
-        mapView.onPause();
+        //mapView.onPause();
         super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        mapView.onDestroy();
+       // mapView.onDestroy();
         super.onDestroyView();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+      //  mapView.onLowMemory();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Bundle mapState = (savedMapState != null) ? savedMapState : new Bundle();
-        mapView.onSaveInstanceState(mapState);
-        outState.putBundle("mapViewSaveState", mapState);
+       // Bundle mapState = (savedMapState != null) ? savedMapState : new Bundle();
+       // mapView.onSaveInstanceState(mapState);
+        //outState.putBundle("mapViewSaveState", mapState);
     }
 }
