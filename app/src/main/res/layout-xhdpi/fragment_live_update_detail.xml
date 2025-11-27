@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    tools:context=".ui.liveupdate.details.LiveUpdateDetailFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+            app:title="@string/title_live_update_details" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <!-- Media Container -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@android:color/black">
+
+                <ImageView
+                    android:id="@+id/iv_media"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/content_desc_update_media"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <!--
+                     ExoPlayer dependency must be in build.gradle.kts:
+                     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+                -->
+                <com.google.android.exoplayer2.ui.PlayerView
+                    android:id="@+id/pv_media"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:use_controller="true"
+                    app:resize_mode="fit"
+                    app:show_buffering="when_playing"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tv_venue_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                    android:textStyle="bold"
+                    tools:text="Revolver Upstairs" />
+
+                <TextView
+                    android:id="@+id/tv_created_at"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    tools:text="Posted on 12 Nov, 10:30 PM" />
+
+                <!-- Stats Grid -->
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:columnCount="2"
+                    android:rowCount="2">
+
+                    <!-- Crowd Level -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_crowd_level"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Overline" />
+
+                        <TextView
+                            android:id="@+id/tv_crowd_level"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/ic_baseline_crowd_24"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textStyle="bold"
+                            app:drawableTint="?attr/colorPrimary"
+                            tools:text="High" />
+                    </LinearLayout>
+
+                    <!-- Wait Time -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_wait_time"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Overline" />
+
+                        <TextView
+                            android:id="@+id/tv_wait_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/ic_baseline_wait_time_24"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textStyle="bold"
+                            app:drawableTint="?attr/colorPrimary"
+                            tools:text="15-30 mins" />
+                    </LinearLayout>
+
+                    <!-- Age Range -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_age_range"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Overline" />
+
+                        <TextView
+                            android:id="@+id/tv_age_range"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/ic_baseline_age_group_24"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textStyle="bold"
+                            app:drawableTint="?attr/colorPrimary"
+                            tools:text="21-24" />
+                    </LinearLayout>
+
+                </GridLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_description"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2" />
+
+                <TextView
+                    android:id="@+id/tv_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    tools:text="The place is packed but the music is great! Line is moving slowly." />
+
+                <!-- Delete Button (Initially Hidden) -->
+                <Button
+                    android:id="@+id/btn_delete"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="@string/action_delete_update"
+                    android:textColor="?attr/colorError"
+                    app:strokeColor="?attr/colorError"
+                    app:icon="@drawable/ic_baseline_delete_24"
+                    app:iconTint="?attr/colorError"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Loading Overlay -->
+    <FrameLayout
+        android:id="@+id/loading_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

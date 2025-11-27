@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@android:color/darker_gray"
+    app:strokeWidth="0dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_venue_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:background="@android:color/darker_gray"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_venue_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            tools:text="Jameson Bar"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintStart_toEndOf="@id/iv_venue_image"
+            app:layout_constraintTop_toTopOf="@id/iv_venue_image"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_venue_type"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            tools:text="Bar | High Crowd"
+            android:textSize="14sp"
+            android:textColor="?android:attr/textColorSecondary"
+            app:layout_constraintStart_toEndOf="@id/iv_venue_image"
+            app:layout_constraintTop_toBottomOf="@id/tv_venue_name"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
