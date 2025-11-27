@@ -43,8 +43,6 @@
     <string name="title_contact_support">Contact Support</string>
     <string name="title_privacy_policy">Privacy Policy</string>
     <string name="title_help_center">Help Center</string>
-
-    <!-- Contact Support Page -->
     <string name="contact_email_header">Email</string>
     <string name="contact_email_address">support@barcrowd.app</string>
     <string name="contact_email_response">We usually reply within 24 hours.</string>
@@ -54,8 +52,6 @@
     <string name="contact_address_details">123 Bourke St, Melbourne VIC 3000</string>
     <string name="contact_hours_header">Opening Hours</string>
     <string name="contact_hours_details">Mon - Fri, 9:00 AM - 5:00 PM</string>
-
-    <!-- Privacy Policy Page -->
     <string name="privacy_title_welcome">Welcome to BarCrowd</string>
     <string name="privacy_last_updated">Last updated: 1 November 2025</string>
     <string name="privacy_intro">Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your information when you use the BarCrowd application.</string>
@@ -74,8 +70,6 @@
     </string>
     <string name="privacy_title_ugc">User-Submitted Content</string>
     <string name="privacy_ugc_body">When you upload a crowd update (photo or video), your content, username, and the time of submission may be visible to other users of the app. By submitting content, you grant BarCrowd a license to display it.</string>
-
-    <!-- Help Center (FAQ) Page -->
     <string name="faq_q1">What is BarCrowd?</string>
     <string name="faq_a1">BarCrowd is a mobile app that lets users check real-time crowd levels at bars and clubs through photos and videos shared by other users.</string>
     <string name="faq_q2">What does "Crowd Level" mean?</string>
@@ -104,11 +98,59 @@
     <string name="details_map_placeholder">address</string>
     <string name="details_opening_hours">Opening Hours</string>
     <string name="details_add_new_update">Add new live update</string>
-    <string name="profile_error_loading">Loading</string>
+
+    <!-- Profile Page -->
+    <string name="profile_error_loading">Loading...</string>
     <string name="profile_updated_success">Profile has been updated</string>
     <string name="profile_update_failed">Profile update has been failed. Please try again. %s</string>
     <string name="profile_update">Update</string>
     <string name="profile_change_photo">Change the photo</string>
     <string name="title_my_profile">Profile</string>
 
+    <!-- Live Update Details Strings -->
+    <string name="title_live_update_details">Live Update Details</string>
+    <string name="content_desc_update_media">User uploaded content</string>
+    <string name="label_crowd_level">CROWD LEVEL</string>
+    <string name="label_wait_time">WAIT TIME</string>
+    <string name="label_age_range">AGE RANGE</string>
+    <string name="label_description">Description</string>
+    <string name="action_delete_update">Delete Update</string>
+    <string name="posted_on_format">Posted on %s</string>
+    <string name="dialog_delete_title">Delete Update?</string>
+    <string name="dialog_delete_message">This will remove the update from the feed. This action cannot be undone.</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="msg_delete_success">Update deleted successfully</string>
+    <string name="msg_delete_error">Failed to delete: %s</string>
+
+    <!-- New Live Update -->
+    <string name="title_new_live_update">New Live Update</string>
+    <string name="label_select_venue">Select Venue</string>
+    <string name="label_upload_video">Upload Video</string>
+    <string name="btn_select_video">Select Video from Gallery</string>
+    <string name="btn_record_video">Record Video (Max 15s)</string>
+    <string name="label_crowd_level_input">Crowd Level</string>
+    <string name="label_wait_time_input">Estimated Wait Time</string>
+    <string name="label_age_range_input">Age Range</string>
+    <string name="hint_description">Add a description (optional)...</string>
+    <string name="btn_post_update">Publish Update</string>
+
+    <!-- Form Options -->
+    <string name="option_low">Low</string>
+    <string name="option_medium">Medium</string>
+    <string name="option_high">High</string>
+
+    <!-- Messages -->
+    <string name="msg_select_venue_error">Please select a venue.</string>
+    <string name="msg_select_video_error">Please record or select a video.</string>
+    <string name="msg_video_too_long">Video is too long! Please limit to 15 seconds.</string>
+    <string name="msg_processing_video">Processing video...</string>
+    <string name="msg_uploading_thumbnail">Uploading thumbnail...</string>
+    <string name="msg_uploading_video">Uploading video...</string>
+    <string name="msg_finalizing_post">Finalizing post...</string>
+    <string name="msg_post_success">Live update posted successfully!</string>
+    <string name="msg_post_error">Failed to post: %s</string>
+    <string name="msg_permission_required">Camera and Storage permissions are required.</string>
+    <string name="msg_error_thumbnail">Could not generate thumbnail from video.</string>
+    <string name="delete_live_update">Delete Live Update</string>
 </resources>

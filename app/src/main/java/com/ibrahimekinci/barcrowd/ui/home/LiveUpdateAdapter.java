@@ -14,12 +14,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.ibrahimekinci.barcrowd.R;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
-// import com.bumptech.glide.Glide;
 
 public class LiveUpdateAdapter extends ListAdapter<LiveUpdate, LiveUpdateAdapter.LiveUpdateViewHolder> {
 
-    public LiveUpdateAdapter() {
+    // Interface for click events
+    public interface OnLiveUpdateClickListener {
+        void onLiveUpdateClick(LiveUpdate liveUpdate);
+    }
+
+    // Member variable to hold the listener
+    private final OnLiveUpdateClickListener clickListener;
+
+    // Constructor accepting the listener
+    public LiveUpdateAdapter(OnLiveUpdateClickListener clickListener) {
         super(DIFF_CALLBACK);
+        this.clickListener = clickListener;
     }
 
     private static final DiffUtil.ItemCallback<LiveUpdate> DIFF_CALLBACK = new DiffUtil.ItemCallback<LiveUpdate>() {
@@ -39,7 +48,7 @@ public class LiveUpdateAdapter extends ListAdapter<LiveUpdate, LiveUpdateAdapter
     public LiveUpdateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_live_update_card, parent, false);
-        return new LiveUpdateViewHolder(view);
+        return new LiveUpdateViewHolder(view, clickListener);
     }
 
     @Override
@@ -48,14 +57,17 @@ public class LiveUpdateAdapter extends ListAdapter<LiveUpdate, LiveUpdateAdapter
         holder.bind(update);
     }
 
-    class LiveUpdateViewHolder extends RecyclerView.ViewHolder {
+    static class LiveUpdateViewHolder extends RecyclerView.ViewHolder {
         private final ImageView ivThumbnail;
         private final TextView tvVenueName;
         private final TextView tvCrowdLevel;
         private final TextView tvWaitTime;
         private final TextView tvAgeGroup;
-        public LiveUpdateViewHolder(@NonNull View itemView) {
+        private final OnLiveUpdateClickListener clickListener;
+
+        public LiveUpdateViewHolder(@NonNull View itemView, OnLiveUpdateClickListener clickListener) {
             super(itemView);
+            this.clickListener = clickListener;
             ivThumbnail = itemView.findViewById(R.id.iv_thumbnail);
             tvVenueName = itemView.findViewById(R.id.tv_venue_name);
             tvCrowdLevel = itemView.findViewById(R.id.tv_crowd_level);
@@ -64,14 +76,16 @@ public class LiveUpdateAdapter extends ListAdapter<LiveUpdate, LiveUpdateAdapter
         }
 
         public void bind(LiveUpdate update) {
-            // Your LiveUpdate model has denormalized data
+            // Bind data to views
             tvVenueName.setText(update.getVenueName());
             tvCrowdLevel.setText(update.getCrowdLevel());
             tvWaitTime.setText(update.getWaitTime());
             tvAgeGroup.setText(update.getAgeRange());
-            String imageUrl = update.getThumbnailUrl(); // Varsa video thumbnail'i
+
+            String imageUrl = update.getThumbnailUrl();
             if (imageUrl == null || imageUrl.isEmpty()) {
-                imageUrl = update.getVenueLogoUrl(); // Yoksa mekan logosu (veya getMediaUrl())
+                // Fallback to venue logo if no thumbnail exists
+                imageUrl = update.getVenueLogoUrl();
             }
 
             Glide.with(itemView.getContext())
@@ -80,6 +94,13 @@ public class LiveUpdateAdapter extends ListAdapter<LiveUpdate, LiveUpdateAdapter
                     .error(R.drawable.liveupdate_placeholder)
                     .centerCrop()
                     .into(ivThumbnail);
+
+            // Set click listener on the item view
+            itemView.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onLiveUpdateClick(update);
+                }
+            });
         }
     }
 }

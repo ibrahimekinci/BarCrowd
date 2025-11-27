@@ -80,8 +80,15 @@ dependencies {
 
     implementation(libs.play.services.maps)
 
+    // Gson (For Room TypeConverters)
+    implementation(libs.gson)
+
+
     // WorkManager
     implementation(libs.work.runtime)
+
+    implementation(libs.exoplayer)
+
 
     // Testing
     testImplementation(libs.junit)

@@ -1,16 +1,12 @@
 package com.ibrahimekinci.barcrowd.domain.usecase;
 
 import androidx.lifecycle.LiveData;
-
 import com.ibrahimekinci.barcrowd.data.repository.VenueRepository;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
 import com.ibrahimekinci.barcrowd.domain.model.VenueFilterOptions;
 
 import java.util.List;
 
-/**
- * Use case for searching venues.
- */
 public class SearchVenuesUseCase {
     private final VenueRepository venueRepository;
 

@@ -31,7 +31,7 @@ public class BarCrowdApplication extends Application {
 
         // 4. Seed sample data
         new Thread(() -> {
-            SampleDataSeeder.seedDatabase();
+            injector.checkAndSeedData();
         }).start();
 
     }

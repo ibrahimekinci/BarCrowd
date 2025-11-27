@@ -5,14 +5,12 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
-    <!-- Global action to return to sign-in (e.g., on logout) -->
     <action
         android:id="@+id/action_global_to_signInFragment"
         app:destination="@id/signInFragment"
         app:popUpTo="@id/nav_graph"
         app:popUpToInclusive="true"/>
 
-    <!-- Home -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.home.HomeFragment"
@@ -24,40 +22,47 @@
         <action
             android:id="@+id/action_homeFragment_to_allVenuesFragment"
             app:destination="@id/allVenuesFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_liveUpdateDetailFragment"
+            app:destination="@id/liveUpdateDetailFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_allLiveUpdatesFragment"
+            app:destination="@id/allLiveUpdatesFragment" />
     </fragment>
 
-    <!-- Search -->
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.search.SearchFragment"
-        android:label="fragment_search"
+        android:label="Search"
         tools:layout="@layout/fragment_search">
         <action
-            android:id="@+id/action_searchFragment_to_resultsFragment"
+            android:id="@+id/action_search_to_results"
             app:destination="@id/resultsFragment" />
     </fragment>
 
-    <!-- New Live Update -->
     <fragment
-        android:id="@+id/newLiveUpdateFragment"
-        android:name="com.ibrahimekinci.barcrowd.ui.post.NewLiveUpdateFragment"
-        android:label="fragment_new_live_update"
-        tools:layout="@layout/fragment_new_live_update" />
+        android:id="@+id/resultsFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.search.results.ResultsFragment"
+        android:label="Results"
+        tools:layout="@layout/fragment_results">
+        <argument
+            android:name="filterOptions"
+            app:argType="com.ibrahimekinci.barcrowd.domain.model.VenueFilterOptions" />
+        <action
+            android:id="@+id/action_resultsFragment_to_venueDetailsFragment"
+            app:destination="@id/venueDetailsFragment" />
+    </fragment>
 
-    <!-- Account -->
     <fragment
         android:id="@+id/accountFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.account.AccountFragment"
         android:label="fragment_account"
         tools:layout="@layout/fragment_account">
-        <!-- Auth Actions -->
         <action
             android:id="@+id/action_accountFragment_to_signInFragment"
             app:destination="@id/signInFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
-
-        <!-- Info Page Actions -->
         <action
             android:id="@+id/action_accountFragment_to_contactSupportFragment"
             app:destination="@id/contactSupportFragment" />
@@ -67,14 +72,15 @@
         <action
             android:id="@+id/action_accountFragment_to_privacyPolicyFragment"
             app:destination="@id/privacyPolicyFragment" />
-
-        <!-- Action to navigate to ProfileFragment -->
         <action
             android:id="@+id/action_accountFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+
+        <action
+            android:id="@+id/action_accountFragment_to_myLiveUpdatesFragment"
+            app:destination="@id/myLiveUpdatesFragment" />
     </fragment>
 
-    <!-- Auth: Sign In -->
     <fragment
         android:id="@+id/signInFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.auth.SignInFragment"
@@ -90,7 +96,6 @@
             app:popUpToInclusive="true" />
     </fragment>
 
-    <!-- Auth: Sign Up -->
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.auth.SignUpFragment"
@@ -103,21 +108,6 @@
             app:popUpToInclusive="true" />
     </fragment>
 
-    <!-- Search Results -->
-    <fragment
-        android:id="@+id/resultsFragment"
-        android:name="com.ibrahimekinci.barcrowd.ui.search.ResultsFragment"
-        android:label="fragment_results"
-        tools:layout="@layout/fragment_results">
-        <argument
-            android:name="filterOptions"
-            app:argType="com.ibrahimekinci.barcrowd.domain.model.VenueFilterOptions" />
-        <action
-            android:id="@+id/action_resultsFragment_to_venueDetailsFragment"
-            app:destination="@id/venueDetailsFragment" />
-    </fragment>
-
-    <!-- All Venues List -->
     <fragment
         android:id="@+id/allVenuesFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.venues.AllVenuesFragment"
@@ -128,7 +118,18 @@
             app:destination="@id/venueDetailsFragment" />
     </fragment>
 
-    <!-- Venue Details -->
+    <fragment
+        android:id="@+id/newLiveUpdateFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.liveupdate.post.NewLiveUpdateFragment"
+        android:label="fragment_new_live_update"
+        tools:layout="@layout/fragment_new_live_update">
+        <argument
+            android:name="venueId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
     <fragment
         android:id="@+id/venueDetailsFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.venues.VenueDetailsFragment"
@@ -137,20 +138,36 @@
         <argument
             android:name="venueId"
             app:argType="string" />
-        <!-- Action to navigate to NewLiveUpdate (will be used later) -->
+
         <action
             android:id="@+id/action_venueDetailsFragment_to_newLiveUpdateFragment"
             app:destination="@id/newLiveUpdateFragment" />
+
+        <action
+            android:id="@+id/action_venueDetailsFragment_to_liveUpdateDetailFragment"
+            app:destination="@id/liveUpdateDetailFragment" />
+
+        <action
+            android:id="@+id/action_venueDetailsFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
     </fragment>
 
-    
+    <fragment
+        android:id="@+id/liveUpdateDetailFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.liveupdate.details.LiveUpdateDetailFragment"
+        android:label="fragment_live_update_detail"
+        tools:layout="@layout/fragment_live_update_detail">
+        <argument
+            android:name="liveUpdate"
+            app:argType="com.ibrahimekinci.barcrowd.domain.model.LiveUpdate" />
+    </fragment>
+
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.account.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
 
-    <!-- Info Pages -->
     <fragment
         android:id="@+id/contactSupportFragment"
         android:name="com.ibrahimekinci.barcrowd.ui.info.ContactSupportFragment"
@@ -167,4 +184,25 @@
         android:label="fragment_help_center"
         tools:layout="@layout/fragment_help_center" />
 
+    <fragment
+        android:id="@+id/myLiveUpdatesFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.liveupdate.myliveupdate.MyLiveUpdatesFragment"
+        android:label="My Live Updates"
+        tools:layout="@layout/fragment_my_live_updates">
+
+        <action
+            android:id="@+id/action_myLiveUpdates_to_detail"
+            app:destination="@id/liveUpdateDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/allLiveUpdatesFragment"
+        android:name="com.ibrahimekinci.barcrowd.ui.liveupdate.feed.AllLiveUpdatesFragment"
+        android:label="All Live Updates"
+        tools:layout="@layout/fragment_all_live_updates">
+
+        <action
+            android:id="@+id/action_allLiveUpdates_to_detail"
+            app:destination="@id/liveUpdateDetailFragment" />
+    </fragment>
 </navigation>

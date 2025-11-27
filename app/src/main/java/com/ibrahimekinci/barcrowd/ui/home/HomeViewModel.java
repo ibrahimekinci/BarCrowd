@@ -7,33 +7,36 @@ import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
 import com.ibrahimekinci.barcrowd.domain.usecase.GetHomePageVenuesUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.GetRecentLiveUpdatesUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.SyncHomeDataUseCase;
 
 import java.util.List;
 
 /**
  * ViewModel for the HomeFragment.
- * Manages the data state for the home screen, providing lists of
- * featured venues and recent live updates.
  */
 public class HomeViewModel extends ViewModel {
 
     private final GetHomePageVenuesUseCase getHomePageVenuesUseCase;
     private final GetRecentLiveUpdatesUseCase getRecentLiveUpdatesUseCase;
+    private final SyncHomeDataUseCase syncHomeDataUseCase; // YENİ
 
-    // LiveData streams exposed to the Fragment
     private final LiveData<List<Venue>> homePageVenues;
     private final LiveData<List<LiveUpdate>> recentLiveUpdates;
-
-    public HomeViewModel(GetHomePageVenuesUseCase getHomePageVenuesUseCase, GetRecentLiveUpdatesUseCase getRecentLiveUpdatesUseCase) {
+    public HomeViewModel(GetHomePageVenuesUseCase getHomePageVenuesUseCase,
+                         GetRecentLiveUpdatesUseCase getRecentLiveUpdatesUseCase,
+                         SyncHomeDataUseCase syncHomeDataUseCase) {
         this.getHomePageVenuesUseCase = getHomePageVenuesUseCase;
         this.getRecentLiveUpdatesUseCase = getRecentLiveUpdatesUseCase;
-
-        // Initialize the data streams when the ViewModel is created
+        this.syncHomeDataUseCase = syncHomeDataUseCase;
         this.homePageVenues = this.getHomePageVenuesUseCase.execute();
         this.recentLiveUpdates = this.getRecentLiveUpdatesUseCase.execute();
+        refreshData();
     }
 
-    // Getters for the Fragment to observe
+    public void refreshData() {
+        syncHomeDataUseCase.execute();
+    }
+
     public LiveData<List<Venue>> getHomePageVenues() {
         return homePageVenues;
     }

@@ -27,6 +27,8 @@ import com.ibrahimekinci.barcrowd.domain.usecase.SearchVenuesUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.SignInUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.SignOutUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.SignUpUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.SoftDeleteLiveUpdateUseCase;
+import com.ibrahimekinci.barcrowd.domain.usecase.SyncHomeDataUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.UpdateUserUseCase;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 
@@ -61,6 +63,12 @@ public class DependencyInjector {
         return storageWrapper;
     }
 
+    public void checkAndSeedData() {
+        // Initializes the seeder with the Firestore wrapper
+        com.ibrahimekinci.barcrowd.debug.SampleDataSeeder seeder =
+                new com.ibrahimekinci.barcrowd.debug.SampleDataSeeder(firestore);
+        seeder.seedData();
+    }
     public UserRepository getUserRepository() {
         return new UserRepositoryImpl(firestore, authWrapper);
     }
@@ -71,6 +79,10 @@ public class DependencyInjector {
 
     public LiveUpdateRepository getLiveUpdateRepository() {
         return new LiveUpdateRepositoryImpl(db, firestore, getApp());
+    }
+
+    public SoftDeleteLiveUpdateUseCase getSoftDeleteLiveUpdateUseCase() {
+        return new SoftDeleteLiveUpdateUseCase(getLiveUpdateRepository());
     }
 
     public SignUpUseCase getSignUpUseCase() {
@@ -114,7 +126,7 @@ public class DependencyInjector {
     }
 
     public PostLiveUpdateUseCase getPostLiveUpdateUseCase() {
-        return new PostLiveUpdateUseCase(getLiveUpdateRepository(), getGetVenueByIdUseCase());
+        return new PostLiveUpdateUseCase(getLiveUpdateRepository(), getVenueRepository());
     }
 
     public GetUpdatesForVenueUseCase getGetUpdatesForVenueUseCase() {
@@ -132,4 +144,8 @@ public class DependencyInjector {
     public GetMyContributionsUseCase getGetMyContributionsUseCase() {
         return new GetMyContributionsUseCase(getLiveUpdateRepository());
     }
+    public SyncHomeDataUseCase getSyncHomeDataUseCase() {
+        return new SyncHomeDataUseCase(getVenueRepository(), getLiveUpdateRepository());
+    }
+
 }

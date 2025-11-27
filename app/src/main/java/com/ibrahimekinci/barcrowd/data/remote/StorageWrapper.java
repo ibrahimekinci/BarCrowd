@@ -13,8 +13,9 @@ import com.ibrahimekinci.barcrowd.util.AppLogger;
 import com.ibrahimekinci.barcrowd.util.StorageException;
 
 public class StorageWrapper {
-    private static final String PROFILE_PHOTO_STORAGE_PATH = "profile_photos/";
-    private static final String VIDEO_STORAGE_PATH = "videos/";
+    private static final String PROFILE_PHOTO_STORAGE_PATH = "profile-photos/";
+    private static final String THUMBNAIL_STORAGE_PATH = "live-updates/thumbnails/";
+    private static final String VIDEO_STORAGE_PATH = "live-updates/videos/";
     private static final long MAX_PROFILE_PHOTO_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
     private static final long MAX_VIDEO_SIZE_BYTES = 100 * 1024 * 1024; // 100 MB
 
@@ -23,10 +24,13 @@ public class StorageWrapper {
 
     public StorageWrapper() {
         this.storage = FirebaseStorage.getInstance().getReference();
-        // Get context from the Application class via the DI
+        // Get context from the Application class via the DI to avoid memory leaks
         this.context = DependencyInjector.getApp().getApplicationContext();
     }
 
+    /**
+     * Uploads a user profile photo.
+     */
     public void uploadProfilePhoto(Uri fileUri, String userId, Callback<String> callback) {
         long fileSize = getFileSize(fileUri);
         if (fileSize == -1) {
@@ -41,6 +45,18 @@ public class StorageWrapper {
         uploadMedia(fileUri, path, callback);
     }
 
+    /**
+     * Uploads a generated thumbnail image for a live update.
+     */
+    public void uploadThumbnail(Uri fileUri, String fileName, Callback<String> callback) {
+        // Thumbnails are small, size check is less critical but good practice
+        String path = THUMBNAIL_STORAGE_PATH + fileName;
+        uploadMedia(fileUri, path, callback);
+    }
+
+    /**
+     * Uploads a video file for a live update.
+     */
     public void uploadVideo(Uri fileUri, String videoName, Callback<String> callback) {
         long fileSize = getFileSize(fileUri);
         if (fileSize == -1) {
@@ -54,12 +70,10 @@ public class StorageWrapper {
 
         String path = VIDEO_STORAGE_PATH + videoName;
         StorageReference ref = storage.child(path);
-        UploadTask uploadTask = ref.putFile(fileUri);
 
-        uploadTask.addOnProgressListener(snapshot -> {
-                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                    AppLogger.i("Upload progress: " + progress + "%");
-                }).addOnSuccessListener(task -> ref.getDownloadUrl()
+        // Use putFile for efficient file uploads
+        ref.putFile(fileUri)
+                .addOnSuccessListener(task -> ref.getDownloadUrl()
                         .addOnSuccessListener(uri -> {
                             AppLogger.i("Video uploaded: " + uri.toString());
                             callback.onSuccess(uri.toString());
@@ -70,10 +84,13 @@ public class StorageWrapper {
                         }))
                 .addOnFailureListener(e -> {
                     AppLogger.e("Video upload failed", e);
-                    callback.onFailure(new StorageException("Upload failed: " + e.getMessage(), e));
+                    callback.onFailure(new StorageException("Video upload failed: " + e.getMessage(), e));
                 });
     }
 
+    /**
+     * generic helper method for image uploads.
+     */
     private void uploadMedia(Uri fileUri, String path, Callback<String> callback) {
         StorageReference ref = storage.child(path);
         ref.putFile(fileUri)
@@ -108,7 +125,6 @@ public class StorageWrapper {
 
     public interface Callback<T> {
         void onSuccess(T result);
-
         void onFailure(StorageException e);
     }
 }

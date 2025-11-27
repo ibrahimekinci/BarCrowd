@@ -113,9 +113,7 @@ public class AccountFragment extends Fragment {
             cardMyUpdates.setOnClickListener(v -> {
                 // Check if user is logged in before navigating
                 if (isUserLoggedIn) {
-                    // TODO: Uncomment when MyUpdatesFragment is created
-                    // navController.navigate(R.id.action_accountFragment_to_myUpdatesFragment);
-                    AppLogger.d("My Updates clicked. Navigation not implemented yet.");
+                     navController.navigate(R.id.action_accountFragment_to_myLiveUpdatesFragment);
                 } else {
                     // User is not logged in, go to sign in
                     navController.navigate(R.id.action_accountFragment_to_signInFragment);

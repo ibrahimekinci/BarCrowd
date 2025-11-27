@@ -7,9 +7,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.ibrahimekinci.barcrowd.domain.usecase.GetUpdatesForVenueUseCase;
 import com.ibrahimekinci.barcrowd.domain.usecase.GetVenueByIdUseCase;
 
-/**
- * Factory for creating VenueDetailsViewModel instances with required dependencies.
- */
 public class VenueDetailsViewModelFactory implements ViewModelProvider.Factory {
 
     private final GetVenueByIdUseCase getVenueByIdUseCase;

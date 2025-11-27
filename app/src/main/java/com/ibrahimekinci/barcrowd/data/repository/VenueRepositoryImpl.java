@@ -1,9 +1,11 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
-import androidx.sqlite.db.SimpleSQLiteQuery;
 
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Query;
 import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
 import com.ibrahimekinci.barcrowd.data.local.VenueDao;
 import com.ibrahimekinci.barcrowd.data.local.VenueEntity;
@@ -14,118 +16,140 @@ import com.ibrahimekinci.barcrowd.domain.model.VenueFilterOptions;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class VenueRepositoryImpl implements VenueRepository {
-    private final VenueDao dao;
+
+    private final VenueDao venueDao;
     private final FirestoreWrapper firestore;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public VenueRepositoryImpl(AppDatabase db, FirestoreWrapper firestore) {
-        this.dao = db.venueDao();
+        this.venueDao = db.venueDao();
         this.firestore = firestore;
     }
 
-    /**
-     * Inserts a list of domain models by mapping them to entities.
-     * This is now private, only used by syncVenues.
-     */
-    private void insertVenues(List<Venue> venues) {
-        // Use the new VenueMapper to convert Venue to VenueEntity
-        List<VenueEntity> entities = venues.stream()
-                .map(VenueMapper::toEntity)
-                .collect(Collectors.toList());
-        new Thread(() -> {
-            dao.insertAll(entities);
-            AppLogger.d("Inserted " + venues.size() + " venues locally");
-        }).start();
+    @Override
+    public LiveData<List<Venue>> getAllVenues() {
+        return Transformations.map(venueDao.getAllVenues(), entities ->
+                entities.stream().map(VenueMapper::toModel).collect(Collectors.toList()));
     }
 
     @Override
     public LiveData<List<Venue>> getHomePageVenues() {
-        syncVenues(); // Trigger background sync
-        // Use the new DAO method and the new VenueMapper
-        return Transformations.map(dao.getHomePageVenues(), entities ->
-                entities.stream()
-                        .map(VenueMapper::toModel)
-                        .collect(Collectors.toList())
-        );
+        return Transformations.map(venueDao.getHomePageVenues(), entities ->
+                entities.stream().map(VenueMapper::toModel).collect(Collectors.toList()));
     }
 
     @Override
     public Venue getVenueById(String venueId) {
-        // Use the new VenueMapper
-        return VenueMapper.toModel(dao.getVenueById(venueId));
-    }
-
-    @Override
-    public LiveData<List<Venue>> searchVenues(VenueFilterOptions filters) {
-        SimpleSQLiteQuery query = buildFilterQuery(filters);
-        return Transformations.map(dao.searchVenuesWithFilters(query), entities ->
-                entities.stream()
-                        .map(VenueMapper::toModel)
-                        .collect(Collectors.toList())
-        );
-    }
-
-    private SimpleSQLiteQuery buildFilterQuery(VenueFilterOptions filters) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM venues WHERE 1=1");
-        List<Object> args = new ArrayList<>();
-
-        if (filters.getNameQuery() != null && !filters.getNameQuery().isEmpty()) {
-            sql.append(" AND name LIKE ?");
-            args.add("%" + filters.getNameQuery() + "%");
-        }
-        if (filters.getType() != null && !filters.getType().isEmpty()) {
-            sql.append(" AND type = ?");
-            args.add(filters.getType());
-        }
-        // IMPORTANT: PDF uses 'last' values, so query 'lastCrowdLevel', not 'average'
-        if (filters.getCrowdLevel() != null && !filters.getCrowdLevel().isEmpty()) {
-            sql.append(" AND lastCrowdLevel = ?");
-            args.add(filters.getCrowdLevel());
-        }
-        if (filters.getWaitTime() != null && !filters.getWaitTime().isEmpty()) {
-            sql.append(" AND lastWaitTime = ?");
-            args.add(filters.getWaitTime());
-        }
-        // IMPORTANT: PDF uses 'last' age range, so query 'mostPopulousAge'
-        if (filters.getAgeRange() != null && !filters.getAgeRange().isEmpty()) {
-            sql.append(" AND mostPopulousAge = ?");
-            args.add(filters.getAgeRange());
-        }
-
-        sql.append(" ORDER BY name ASC");
-        return new SimpleSQLiteQuery(sql.toString(), args.toArray());
+        VenueEntity entity = venueDao.getVenueById(venueId);
+        return VenueMapper.toModel(entity);
     }
 
     @Override
     public void syncVenues() {
-        firestore.listenForChanges("Venues", null, null, snapshots -> {
-            if (snapshots == null) return;
-
-            // Map all documents from Firestore to Venue domain models
-            List<Venue> venues = snapshots.getDocuments().stream()
-                    .map(doc -> doc.toObject(Venue.class))
-                    .collect(Collectors.toList());
-
-            // Insert the domain models (which will be mapped to entities)
-            if (!venues.isEmpty()) {
-                insertVenues(venues);
-                AppLogger.i("Synced " + venues.size() + " venues from Firestore");
-            }
-        });
+        firestore.getDb().collection("Venues").get()
+                .addOnSuccessListener(snapshots -> {
+                    if (snapshots != null) {
+                        List<Venue> venues = snapshots.toObjects(Venue.class);
+                        executor.execute(() -> {
+                            List<VenueEntity> entities = new ArrayList<>();
+                            for (Venue v : venues) entities.add(VenueMapper.toEntity(v));
+                            venueDao.insertVenues(entities);
+                        });
+                    }
+                })
+                .addOnFailureListener(e -> AppLogger.e("Sync venues failed", e));
     }
 
     @Override
-    public LiveData<List<Venue>> getAllVenuesSortedByName() {
-        // We still sync all venues, as this list is expected to be complete.
-        syncVenues();
+    public LiveData<List<Venue>> searchVenues(VenueFilterOptions filters) {
+        MutableLiveData<List<Venue>> results = new MutableLiveData<>();
 
-        return Transformations.map(dao.getAllVenuesSortedByName(), entities ->
-                entities.stream()
-                        .map(VenueMapper::toModel)
-                        .collect(Collectors.toList())
-        );
+        // 1. Fetch ALL venues from Firestore (Since we need 'Contains' logic)
+        // Note: For production with thousands of venues, use Algolia.
+        // For this project, fetching all (small dataset) and filtering client-side is acceptable.
+        Query query = firestore.getDb().collection("Venues");
+
+        query.get().addOnSuccessListener(snapshots -> {
+            List<Venue> filteredList = new ArrayList<>();
+            if (snapshots != null) {
+                List<Venue> rawList = snapshots.toObjects(Venue.class);
+
+                for (Venue v : rawList) {
+                    boolean matches = true;
+
+                    // 2. Filter by Name (Case-insensitive Contains)
+                    if (filters.getVenueNameQuery() != null && !filters.getVenueNameQuery().isEmpty()) {
+                        String queryText = filters.getVenueNameQuery().toLowerCase();
+                        String venueName = v.getName().toLowerCase();
+
+                        // "LIKE %name%" logic
+                        if (!venueName.contains(queryText)) {
+                            matches = false;
+                        }
+                    }
+
+                    // 3. Other Filters
+                    if (matches && !filters.getVenueType().equals("Any") &&
+                            (v.getType() == null || !v.getType().equalsIgnoreCase(filters.getVenueType()))) {
+                        matches = false;
+                    }
+
+                    if (matches && !filters.getLastLiveUpdateCrowdLevel().equals("Any") &&
+                            (v.getLastLiveUpdateCrowdLevel() == null || !v.getLastLiveUpdateCrowdLevel().equalsIgnoreCase(filters.getLastLiveUpdateCrowdLevel()))) {
+                        matches = false;
+                    }
+
+                    if (matches && !filters.getLastLiveUpdateWaitTime().equals("Any") &&
+                            (v.getLastLiveUpdateWaitTime() == null || !v.getLastLiveUpdateWaitTime().equalsIgnoreCase(filters.getLastLiveUpdateWaitTime()))) {
+                        matches = false;
+                    }
+
+                    if (matches && !filters.getLastLiveUpdateAgeRange().equals("Any") &&
+                            (v.getLastLiveUpdateAgeRange() == null || !v.getLastLiveUpdateAgeRange().equalsIgnoreCase(filters.getLastLiveUpdateAgeRange()))) {
+                        matches = false;
+                    }
+
+                    if (matches) filteredList.add(v);
+                }
+            }
+            results.setValue(filteredList);
+        }).addOnFailureListener(e -> {
+            AppLogger.e("Search failed", e);
+            results.setValue(new ArrayList<>());
+        });
+
+        return results;
+    }
+
+    @Override
+    public void updateVenueStats(String venueId, String crowd, String wait, String age) {
+        if (venueId == null) return;
+
+        Timestamp now = Timestamp.now();
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("lastLiveUpdateCrowdLevel", crowd);
+        updates.put("lastLiveUpdateWaitTime", wait);
+        updates.put("lastLiveUpdateAgeRange", age);
+        updates.put("lastLiveUpdateCreatedAt", now);
+
+        // Update Firestore
+        firestore.getDb().collection("Venues").document(venueId).update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    AppLogger.d("Venue stats updated in Firestore for " + venueId);
+                    // Update Local DB
+                    executor.execute(() -> {
+                        venueDao.updateVenueStats(venueId, crowd, wait, age, now.toDate());
+                    });
+                })
+                .addOnFailureListener(e -> AppLogger.e("Failed to update venue stats", e));
     }
 }

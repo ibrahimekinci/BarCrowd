@@ -20,7 +20,7 @@ public interface RoomDatabaseProvider {
     class ProductionProvider implements RoomDatabaseProvider {
         @Override
         public AppDatabase getDatabase(Context context) {
-            return Room.databaseBuilder(context, AppDatabase.class, "barcrowd-db").build();
+            return Room.databaseBuilder(context, AppDatabase.class, "barcrowd-db").fallbackToDestructiveMigration().build();
         }
     }
 }
