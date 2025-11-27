@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 public class AllLiveUpdatesViewModel extends ViewModel {
 
     private final GetAllLiveUpdatesUseCase getAllLiveUpdatesUseCase;
-
-    // LiveData'yı filtreleyip UI'a gönderecek olan ana LiveData
     private final MediatorLiveData<List<LiveUpdate>> liveFeedUpdates = new MediatorLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
 
@@ -28,13 +26,10 @@ public class AllLiveUpdatesViewModel extends ViewModel {
     private void loadUpdates() {
         isLoading.setValue(true);
 
-        // UseCase'den gelen LiveData'yı dinle
         LiveData<List<LiveUpdate>> source = getAllLiveUpdatesUseCase.execute();
 
-        // MediatorLiveData kullanarak veriyi al ve filtrele
         liveFeedUpdates.addSource(source, updates -> {
             if (updates != null) {
-                // Sadece silinmemiş ve geçerli olanları filtrele
                 List<LiveUpdate> filtered = updates.stream()
                         .filter(update -> !update.getIsDeleted())
                         .collect(Collectors.toList());

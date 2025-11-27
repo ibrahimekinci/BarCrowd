@@ -29,7 +29,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 1. Venue Selector -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -50,7 +49,6 @@
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- 2. Video Selection / Recording -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,7 +83,6 @@
                     app:icon="@drawable/ic_baseline_photo_library_24" />
             </LinearLayout>
 
-            <!-- Video Preview Area -->
             <FrameLayout
                 android:id="@+id/fl_preview_container"
                 android:layout_width="match_parent"
@@ -95,7 +92,6 @@
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <!-- The Generated Thumbnail -->
                 <ImageView
                     android:id="@+id/iv_thumbnail"
                     android:layout_width="match_parent"
@@ -103,7 +99,6 @@
                     android:scaleType="centerCrop"
                     android:contentDescription="Video thumbnail" />
 
-                <!-- Play Icon Overlay -->
                 <ImageView
                     android:id="@+id/iv_play_icon"
                     android:layout_width="56dp"
@@ -112,7 +107,6 @@
                     android:src="@drawable/ic_baseline_play_arrow_24"
                     app:tint="@android:color/white" />
 
-                <!-- Actual Player (Hidden until play clicked) -->
                 <com.google.android.exoplayer2.ui.PlayerView
                     android:id="@+id/pv_video"
                     android:layout_width="match_parent"
@@ -121,7 +115,6 @@
                     app:use_controller="true"
                     app:resize_mode="fit" />
 
-                <!-- Remove Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_clear_video"
                     style="@style/Widget.Material3.Button.IconButton"
@@ -134,7 +127,6 @@
                     android:backgroundTint="#99000000" />
             </FrameLayout>
 
-            <!-- 3. Crowd Details -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -142,36 +134,36 @@
                 android:text="@string/label_crowd_level_input"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chip_group_crowd"
+            <RadioGroup
+                android:id="@+id/rg_crowd_level"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:singleSelection="true">
+                android:orientation="horizontal">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_low"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/rb_low"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/option_low" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_medium"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/rb_medium"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
                     android:text="@string/option_medium" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_high"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/rb_high"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/option_high" />
-            </com.google.android.material.chip.ChipGroup>
+            </RadioGroup>
 
-            <!-- Wait Time -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -186,7 +178,6 @@
                 android:layout_marginTop="8dp"
                 android:minHeight="48dp" />
 
-            <!-- Age Range -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -201,7 +192,6 @@
                 android:layout_marginTop="8dp"
                 android:minHeight="48dp" />
 
-            <!-- Description -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_description"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -218,7 +208,6 @@
                     android:minLines="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Submit Button -->
             <Button
                 android:id="@+id/btn_post"
                 android:layout_width="match_parent"
@@ -230,7 +219,6 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Loading Overlay -->
     <FrameLayout
         android:id="@+id/loading_overlay"
         android:layout_width="match_parent"

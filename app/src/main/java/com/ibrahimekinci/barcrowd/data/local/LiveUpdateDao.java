@@ -13,16 +13,24 @@ public interface LiveUpdateDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(LiveUpdateEntity liveUpdate);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertLiveUpdates(List<LiveUpdateEntity> updates);
-    @Query("SELECT * FROM live_updates ORDER BY createdAt DESC")
+
+    // DÜZELTME: Sadece silinmemiş olanları getir (isDeleted = 0 -> false)
+    @Query("SELECT * FROM live_updates WHERE isDeleted = 0 ORDER BY createdAt DESC")
     LiveData<List<LiveUpdateEntity>> getAllLiveUpdates();
-    @Query("SELECT * FROM live_updates ORDER BY createdAt DESC")
+
+    // DÜZELTME: Sadece silinmemiş olanları getir
+    @Query("SELECT * FROM live_updates WHERE isDeleted = 0 ORDER BY createdAt DESC")
     List<LiveUpdateEntity> getAllLiveUpdatesSync();
+
     @Query("SELECT * FROM live_updates WHERE updateId = :id")
     LiveUpdateEntity getLiveUpdateById(String id);
+
     @Query("SELECT * FROM live_updates WHERE syncStatus = 0")
     List<LiveUpdateEntity> getPendingUpdates();
+
     @Query("UPDATE live_updates SET syncStatus = 1 WHERE updateId = :id")
     void markAsSynced(String id);
 }

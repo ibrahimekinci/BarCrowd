@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
 import com.ibrahimekinci.barcrowd.data.local.LiveUpdateDao;
@@ -28,61 +29,107 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
     private final Application app;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    // Canlı dinleyiciyi takip etmek için değişken (Memory leak ve duplicate önler)
+    private ListenerRegistration liveUpdatesListener;
+
     public LiveUpdateRepositoryImpl(AppDatabase db, FirestoreWrapper firestore, Application app) {
         this.dao = db.liveUpdateDao();
         this.firestore = firestore;
         this.app = app;
     }
 
-    // --- IMPLEMENTATION OF CALLBACK METHODS ---
+    // --- OTOMATİK SENKRONİZASYON (ANA ÇÖZÜM) ---
 
     @Override
-    public void getAllLiveUpdates(LoadCallback callback) {
-        // 1. Attempt to fetch from Firestore
-        firestore.getDb().collection("LiveUpdates")
+    public void syncRecentLiveUpdates() {
+        // Eğer zaten bir dinleyici varsa tekrar oluşturma (Duplicate önleme)
+        if (liveUpdatesListener != null) {
+            AppLogger.d("LiveUpdates listener already active. Skipping re-init.");
+            return;
+        }
+
+        AppLogger.i("Starting Real-time LiveUpdates Listener...");
+
+        Query query = firestore.getDb().collection("LiveUpdates")
+                .whereEqualTo("isDeleted", false)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(snapshots -> {
-                    List<LiveUpdate> list = new ArrayList<>();
-                    if (snapshots != null) {
-                        list = snapshots.toObjects(LiveUpdate.class);
-                        // Save to local database
-                        saveListToLocal(list);
-                    }
-                    callback.onLoaded(list);
-                })
-                .addOnFailureListener(e -> {
-                    AppLogger.e("Remote fetch failed, trying local.", e);
-                    // 2. Fallback to Local DB
-                    executor.execute(() -> {
-                        try {
-                            // Using synchronous method from DAO
-                            List<LiveUpdateEntity> entities = dao.getAllLiveUpdatesSync();
-                            List<LiveUpdate> localList = new ArrayList<>();
-                            for (LiveUpdateEntity ent : entities) {
-                                localList.add(LiveUpdateMapper.toModel(ent));
+                .limit(100);
+
+        // Listener'ı başlatıyoruz ve referansını değişkene atıyoruz
+        liveUpdatesListener = query.addSnapshotListener((snapshots, e) -> {
+            if (e != null) {
+                AppLogger.e("Sync listener failed", e);
+                return;
+            }
+
+            if (snapshots != null && !snapshots.isEmpty()) {
+                AppLogger.d("🔥 Firestore Event Received! Changes: " + snapshots.getDocumentChanges().size());
+
+                executor.execute(() -> {
+                    int addedCount = 0;
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        // Sadece EKLENEN ve DEĞİŞENLERİ (Modified) alıyoruz
+                        if (dc.getType() == DocumentChange.Type.ADDED || dc.getType() == DocumentChange.Type.MODIFIED) {
+                            LiveUpdate model = dc.getDocument().toObject(LiveUpdate.class);
+                            LiveUpdateEntity entity = LiveUpdateMapper.toEntity(model);
+
+                            if (entity != null) {
+                                entity.setSyncStatus(true);
+                                // Room'a yazınca LiveData Home'da otomatik tetiklenir
+                                dao.insert(entity);
+                                addedCount++;
                             }
-                            callback.onLoaded(localList);
-                        } catch (Exception ex) {
-                            callback.onError(ex);
                         }
-                    });
+                        // Silinenleri de yerel DB'den silebiliriz (Optional)
+                        if (dc.getType() == DocumentChange.Type.REMOVED) {
+                            LiveUpdate model = dc.getDocument().toObject(LiveUpdate.class);
+                            // dao.deleteById(model.getUpdateId()); gibi bir metod varsa kullanılabilir
+                        }
+                    }
+                    AppLogger.d("✅ Processed " + addedCount + " updates into Local DB via Listener.");
                 });
+            }
+        });
     }
 
+    // --- YENİ POST ATMA İŞLEMİ ---
+
     @Override
-    public void softDeleteUpdate(LiveUpdate update, DeleteCallback callback) {
-        if (update.getUpdateId() == null) {
+    public void saveLiveUpdate(LiveUpdate liveUpdate, SaveCallback callback) {
+        if (liveUpdate.getUpdateId() == null) {
             if (callback != null) callback.onError(new Exception("Update ID is null"));
             return;
         }
 
-        // 1. Update Firestore
+        firestore.getDb().collection("LiveUpdates")
+                .document(liveUpdate.getUpdateId())
+                .set(liveUpdate)
+                .addOnSuccessListener(aVoid -> {
+                    AppLogger.d("Post sent to Firestore successfully: " + liveUpdate.getUpdateId());
+                    if (callback != null) callback.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    AppLogger.e("Failed to send post", e);
+                    if (callback != null) callback.onError(e);
+                });
+    }
+
+    @Override
+    public LiveData<List<LiveUpdate>> getAllLiveUpdates() {
+        return Transformations.map(dao.getAllLiveUpdates(), entities ->
+                entities.stream()
+                        .map(LiveUpdateMapper::toModel)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    @Override
+    public void softDeleteUpdate(LiveUpdate update, DeleteCallback callback) {
+        if (update.getUpdateId() == null) return;
         firestore.getDb().collection("LiveUpdates")
                 .document(update.getUpdateId())
                 .update("isDeleted", true)
                 .addOnSuccessListener(aVoid -> {
-                    // 2. Update Local DB
                     executor.execute(() -> {
                         update.setDeleted(true);
                         LiveUpdateEntity entity = LiveUpdateMapper.toEntity(update);
@@ -96,89 +143,29 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
     }
 
     @Override
-    public void saveLiveUpdate(LiveUpdate liveUpdate, SaveCallback callback) {
-        if (liveUpdate.getUpdateId() == null) {
-            if (callback != null) callback.onError(new Exception("Update ID is null"));
-            return;
-        }
-
-        // 1. Save to Firestore
+    public void getAllLiveUpdates(LoadCallback callback) {
+        // Bu metod callback tabanlı veri çekmek içindir (Manuel yenileme vs.)
         firestore.getDb().collection("LiveUpdates")
-                .document(liveUpdate.getUpdateId())
-                .set(liveUpdate)
-                .addOnSuccessListener(aVoid -> {
-                    // 2. Save to Local DB
-                    executor.execute(() -> {
-                        LiveUpdateEntity entity = LiveUpdateMapper.toEntity(liveUpdate);
-                        if (entity != null) dao.insert(entity);
-                    });
-                    if (callback != null) callback.onSuccess();
-                })
-                .addOnFailureListener(e -> {
-                    if (callback != null) callback.onError(e);
-                });
-    }
-
-    // --- IMPLEMENTATION OF LIVEDATA METHODS ---
-
-    @Override
-    public LiveData<List<LiveUpdate>> getAllLiveUpdates() {
-        return Transformations.map(dao.getAllLiveUpdates(), entities ->
-                entities.stream()
-                        .map(LiveUpdateMapper::toModel)
-                        .collect(Collectors.toList())
-        );
-    }
-
-    @Override
-    public void postUpdate(LiveUpdate update) {
-        saveLiveUpdate(update, null);
-    }
-
-    @Override
-    public LiveData<List<LiveUpdate>> getRecentLiveUpdates() {
-        return getAllLiveUpdates();
-    }
-
-    @Override
-    public LiveData<List<LiveUpdate>> getUpdatesForVenue(String venueId) {
-        return new MutableLiveData<>(new ArrayList<>());
-    }
-
-    @Override
-    public LiveData<List<LiveUpdate>> getUserContributions(String userId) {
-        return new MutableLiveData<>(new ArrayList<>());
-    }
-
-    // --- SYNC METHODS ---
-
-    @Override
-    public void syncUpdates(String venueId) {
-        // Optional sync logic
-    }
-
-    @Override
-    public void syncPending() {
-        // Optional sync logic
-    }
-
-    @Override
-    public void syncRecentLiveUpdates() {
-        Query query = firestore.getDb().collection("LiveUpdates")
-                .whereEqualTo("isDeleted", false)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(100);
-
-        query.addSnapshotListener((snapshots, e) -> {
-            if (e != null) return;
-            if (snapshots != null) {
-                List<LiveUpdate> list = snapshots.toObjects(LiveUpdate.class);
-                saveListToLocal(list);
-            }
-        });
+                .get()
+                .addOnSuccessListener(snapshots -> {
+                    List<LiveUpdate> list = new ArrayList<>();
+                    if (snapshots != null) {
+                        list = snapshots.toObjects(LiveUpdate.class);
+                        saveListToLocal(list);
+                    }
+                    callback.onLoaded(list);
+                })
+                .addOnFailureListener(callback::onError);
     }
 
-    // --- HELPER METHODS ---
+    // Boilerplate / Empty methods to prevent compile errors
+    @Override public void postUpdate(LiveUpdate update) { saveLiveUpdate(update, null); }
+    @Override public LiveData<List<LiveUpdate>> getRecentLiveUpdates() { return getAllLiveUpdates(); }
+    @Override public LiveData<List<LiveUpdate>> getUpdatesForVenue(String venueId) { return new MutableLiveData<>(new ArrayList<>()); }
+    @Override public LiveData<List<LiveUpdate>> getUserContributions(String userId) { return new MutableLiveData<>(new ArrayList<>()); }
+    @Override public void syncUpdates(String venueId) {}
+    @Override public void syncPending() {}
 
     private void saveListToLocal(List<LiveUpdate> list) {
         executor.execute(() -> {
@@ -190,9 +177,5 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
                 }
             }
         });
-    }
-
-    private void saveToLocal(List<LiveUpdate> list) {
-        saveListToLocal(list);
     }
 }

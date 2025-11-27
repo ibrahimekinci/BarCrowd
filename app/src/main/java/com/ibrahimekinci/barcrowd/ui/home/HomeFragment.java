@@ -19,17 +19,19 @@ import com.ibrahimekinci.barcrowd.di.DependencyInjector;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
 
+import java.util.ArrayList;
+
 public class HomeFragment extends Fragment implements VenueAdapter.OnVenueClickListener, LiveUpdateAdapter.OnLiveUpdateClickListener {
 
     private HomeViewModel viewModel;
     private NavController navController;
     private VenueAdapter venueAdapter;
     private LiveUpdateAdapter liveUpdateAdapter;
+    private RecyclerView rvLiveUpdates;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -37,7 +39,6 @@ public class HomeFragment extends Fragment implements VenueAdapter.OnVenueClickL
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // --- 1. Get Dependencies ---
         DependencyInjector injector = ((BarCrowdApplication) requireActivity().getApplication()).getDependencyInjector();
         HomeViewModelFactory factory = new HomeViewModelFactory(
                 injector.getGetHomePageVenuesUseCase(),
@@ -46,81 +47,79 @@ public class HomeFragment extends Fragment implements VenueAdapter.OnVenueClickL
         );
         viewModel = new ViewModelProvider(this, factory).get(HomeViewModel.class);
 
-        // --- 2. Find Views ---
         navController = Navigation.findNavController(view);
         Button btnShowAllUpdates = view.findViewById(R.id.btn_show_all_updates);
         Button btnShowAllVenues = view.findViewById(R.id.btn_show_all_venues);
 
-        // --- 3. Setup RecyclerViews ---
         setupLiveUpdatesRecyclerView(view);
         setupVenuesRecyclerView(view);
 
-        // --- 4. Setup Observers ---
         observeViewModel();
 
-        // --- 5. Setup Listeners ---
-        btnShowAllUpdates.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(v);
-            navController.navigate(R.id.action_homeFragment_to_allLiveUpdatesFragment);
-        });
+        btnShowAllUpdates.setOnClickListener(v -> navController.navigate(R.id.action_homeFragment_to_allLiveUpdatesFragment));
+        btnShowAllVenues.setOnClickListener(v -> navController.navigate(R.id.action_homeFragment_to_allVenuesFragment));
+    }
 
-        btnShowAllVenues.setOnClickListener(v -> {
-            // Navigate to the All Venues list
-            navController.navigate(R.id.action_homeFragment_to_allVenuesFragment);
-        });
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (viewModel != null) {
+            viewModel.refreshData();
+        }
     }
 
     private void setupLiveUpdatesRecyclerView(View view) {
-        RecyclerView rvLiveUpdates = view.findViewById(R.id.rv_live_updates);
-        // Use a horizontal layout manager
-        rvLiveUpdates.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        rvLiveUpdates = view.findViewById(R.id.rv_live_updates);
 
-        // --- UPDATED: Pass 'this' (the fragment) as the click listener ---
+        rvLiveUpdates.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         liveUpdateAdapter = new LiveUpdateAdapter(this);
         rvLiveUpdates.setAdapter(liveUpdateAdapter);
     }
 
     private void setupVenuesRecyclerView(View view) {
         RecyclerView rvVenues = view.findViewById(R.id.rv_venues);
-        // Use a vertical layout manager
         rvVenues.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-
-        // Pass 'this' (the fragment) as the click listener
         venueAdapter = new VenueAdapter(this);
         rvVenues.setAdapter(venueAdapter);
     }
 
     private void observeViewModel() {
-        // Observe the featured venues
         viewModel.getHomePageVenues().observe(getViewLifecycleOwner(), venues -> {
             if (venues != null) {
-                venueAdapter.submitList(venues);
+                venueAdapter.submitList(new ArrayList<>(venues));
             }
         });
 
-        // Observe the recent live updates
         viewModel.getRecentLiveUpdates().observe(getViewLifecycleOwner(), updates -> {
             if (updates != null) {
-                liveUpdateAdapter.submitList(updates);
+                liveUpdateAdapter.submitList(new ArrayList<>(updates), () -> {
+                    if (!updates.isEmpty()) {
+                        rvLiveUpdates.scrollToPosition(0);
+                    }
+                });
             }
         });
     }
 
-    // --- Venue Click Implementation ---
     @Override
     public void onVenueClick(Venue venue) {
-        // Navigate to Venue Details passing the ID
-        HomeFragmentDirections.ActionHomeFragmentToVenueDetailsFragment action =
-                HomeFragmentDirections.actionHomeFragmentToVenueDetailsFragment(venue.getVenueId());
-        navController.navigate(action);
+        try {
+            HomeFragmentDirections.ActionHomeFragmentToVenueDetailsFragment action =
+                    HomeFragmentDirections.actionHomeFragmentToVenueDetailsFragment(venue.getVenueId());
+            navController.navigate(action);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    // --- Live Update Click Implementation ---
     @Override
     public void onLiveUpdateClick(LiveUpdate liveUpdate) {
-        // Navigate to Live Update Details passing the object
-        HomeFragmentDirections.ActionHomeFragmentToLiveUpdateDetailFragment action =
-                HomeFragmentDirections.actionHomeFragmentToLiveUpdateDetailFragment(liveUpdate);
-        navController.navigate(action);
+        try {
+            HomeFragmentDirections.ActionHomeFragmentToLiveUpdateDetailFragment action =
+                    HomeFragmentDirections.actionHomeFragmentToLiveUpdateDetailFragment(liveUpdate);
+            navController.navigate(action);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

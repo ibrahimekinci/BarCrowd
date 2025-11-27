@@ -56,14 +56,13 @@ public class LiveFeedAdapter extends RecyclerView.Adapter<LiveFeedAdapter.ViewHo
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView ivAvatar, ivThumbnail;
+        private final ImageView  ivThumbnail;
         private final TextView tvVenueName, tvTimeAgo, tvDescription;
         private final Chip chipCrowd, chipWait, chipAge;
         private final View btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivAvatar = itemView.findViewById(R.id.iv_user_avatar);
             ivThumbnail = itemView.findViewById(R.id.iv_thumbnail);
             tvVenueName = itemView.findViewById(R.id.tv_venue_name);
             tvTimeAgo = itemView.findViewById(R.id.tv_time_ago);
@@ -98,17 +97,6 @@ public class LiveFeedAdapter extends RecyclerView.Adapter<LiveFeedAdapter.ViewHo
                         .centerCrop()
                         .placeholder(android.R.color.darker_gray)
                         .into(ivThumbnail);
-            }
-
-            if (update.getVenueLogoUrl() != null) {
-                Glide.with(itemView.getContext())
-                        .load(update.getVenueLogoUrl())
-                        .circleCrop()
-                        .placeholder(android.R.drawable.sym_def_app_icon)
-                        .into(ivAvatar);
-            } else {
-                // Fallback
-                ivAvatar.setImageResource(android.R.drawable.sym_def_app_icon);
             }
 
             itemView.setOnClickListener(v -> listener.onItemClick(update));

@@ -18,6 +18,7 @@ import com.ibrahimekinci.barcrowd.util.StorageException;
 import com.ibrahimekinci.barcrowd.util.ValidationException;
 
 import java.util.List;
+import java.util.UUID;
 
 public class NewLiveUpdateViewModel extends ViewModel {
 
@@ -29,7 +30,6 @@ public class NewLiveUpdateViewModel extends ViewModel {
     private final LiveData<List<Venue>> allVenues;
     private final LiveData<User> currentUser;
 
-    // UI State
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> loadingMessage = new MutableLiveData<>("");
     private final MutableLiveData<String> error = new MutableLiveData<>();
@@ -75,7 +75,16 @@ public class NewLiveUpdateViewModel extends ViewModel {
             return;
         }
 
+        // Seçilen mekanı bul (Bilgilerini kopyalamak için)
+        Venue selectedVenue = findVenueById(venueId);
+        if (selectedVenue == null) {
+            error.setValue("Selected venue not found in list.");
+            return;
+        }
+
         isLoading.setValue(true);
+        String updateUUID = UUID.randomUUID().toString();
+
         long timestamp = System.currentTimeMillis();
         String thumbName = "thumb_" + user.getUserId() + "_" + timestamp + ".jpg";
         String videoName = "video_" + user.getUserId() + "_" + timestamp + ".mp4";
@@ -86,7 +95,7 @@ public class NewLiveUpdateViewModel extends ViewModel {
             @Override
             public void onSuccess(String thumbnailUrl) {
                 loadingMessage.setValue("Uploading video...");
-                uploadVideoAndPost(user.getUserId(), venueId, videoUri, videoName, thumbnailUrl, crowdLevel, waitTime, ageRange, description);
+                uploadVideoAndPost(updateUUID, user, selectedVenue, videoUri, videoName, thumbnailUrl, crowdLevel, waitTime, ageRange, description);
             }
 
             @Override
@@ -97,7 +106,20 @@ public class NewLiveUpdateViewModel extends ViewModel {
         });
     }
 
-    private void uploadVideoAndPost(String userId, String venueId, Uri videoUri, String videoName, String thumbnailUrl,
+    // Yardımcı metod: ID'den Venue nesnesini bulur
+    private Venue findVenueById(String venueId) {
+        List<Venue> venues = allVenues.getValue();
+        if (venues != null) {
+            for (Venue v : venues) {
+                if (v.getVenueId().equals(venueId)) {
+                    return v;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void uploadVideoAndPost(String updateId, User user, Venue venue, Uri videoUri, String videoName, String thumbnailUrl,
                                     String crowdLevel, String waitTime, String ageRange, String description) {
 
         storageWrapper.uploadVideo(videoUri, videoName, new StorageWrapper.Callback<String>() {
@@ -106,14 +128,32 @@ public class NewLiveUpdateViewModel extends ViewModel {
                 loadingMessage.setValue("Finalizing post...");
 
                 LiveUpdate update = new LiveUpdate();
-                update.setVenueId(venueId);
-                update.setUserId(userId);
+                update.setUpdateId(updateId);
+
+                // İlişkisel ID'ler
+                update.setVenueId(venue.getVenueId());
+                update.setUserId(user.getUserId());
+
+                // --- DÜZELTİLEN KISIM: Denormalize Veriler ---
+                // Mekan bilgileri (Feed'de görünmesi için)
+                update.setVenueName(venue.getName());
+                update.setVenueType(venue.getType());
+                update.setVenueLogoUrl(venue.getLogoUrl());
+
+                // Kullanıcı bilgileri
+                update.setUserName(user.getUsername());
+                update.setUserPhotoUrl(user.getProfilePhotoUrl());
+                // --------------------------------------------
+
                 update.setMediaUrl(videoUrl);
                 update.setThumbnailUrl(thumbnailUrl);
                 update.setCrowdLevel(crowdLevel);
                 update.setWaitTime(waitTime);
                 update.setAgeRange(ageRange);
                 update.setDescription(description);
+
+                update.setDeleted(false);
+                update.setCreatedAt(com.google.firebase.Timestamp.now());
 
                 savePostToFirestore(update);
             }
@@ -127,7 +167,6 @@ public class NewLiveUpdateViewModel extends ViewModel {
     }
 
     private void savePostToFirestore(LiveUpdate update) {
-        // FIXED: Provide the required Callback to execute()
         postLiveUpdateUseCase.execute(update, new PostLiveUpdateUseCase.Callback() {
             @Override
             public void onSuccess() {

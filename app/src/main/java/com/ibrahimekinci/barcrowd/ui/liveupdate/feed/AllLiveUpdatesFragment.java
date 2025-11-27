@@ -17,6 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.appbar.MaterialToolbar; // Eklendi
 import com.ibrahimekinci.barcrowd.BarCrowdApplication;
 import com.ibrahimekinci.barcrowd.R;
 import com.ibrahimekinci.barcrowd.di.DependencyInjector;
@@ -31,6 +32,7 @@ public class AllLiveUpdatesFragment extends Fragment implements LiveFeedAdapter.
     private RecyclerView rvFeed;
     private ProgressBar pbLoading;
     private TextView tvEmptyView;
+    private MaterialToolbar toolbar; // Eklendi
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -48,6 +50,12 @@ public class AllLiveUpdatesFragment extends Fragment implements LiveFeedAdapter.
         rvFeed = view.findViewById(R.id.rv_live_feed);
         pbLoading = view.findViewById(R.id.pb_loading);
         tvEmptyView = view.findViewById(R.id.tv_empty_view);
+        toolbar = view.findViewById(R.id.toolbar); // Eklendi
+
+        // Toolbar Geri Tuşu Ayarı
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> navController.popBackStack());
+        }
 
         setupRecyclerView();
         setupViewModel();
@@ -63,7 +71,7 @@ public class AllLiveUpdatesFragment extends Fragment implements LiveFeedAdapter.
     }
 
     private void setupRecyclerView() {
-        adapter = new LiveFeedAdapter(this); // 'this' ile tıklama listener'ını gönderiyoruz
+        adapter = new LiveFeedAdapter(this);
         rvFeed.setLayoutManager(new LinearLayoutManager(getContext()));
         rvFeed.setAdapter(adapter);
     }
@@ -85,18 +93,14 @@ public class AllLiveUpdatesFragment extends Fragment implements LiveFeedAdapter.
         });
     }
 
-    // Adaptör Tıklama Hareketi
     @Override
     public void onItemClick(LiveUpdate update) {
         try {
-            // Safe Args kütüphanesi ile LiveUpdate objesini gönderiyoruz.
-            // Bu action'ın nav_graph.xml'de tanımlı olması gerekir.
             AllLiveUpdatesFragmentDirections.ActionAllLiveUpdatesToDetail action =
                     AllLiveUpdatesFragmentDirections.actionAllLiveUpdatesToDetail(update);
             navController.navigate(action);
         } catch (Exception e) {
-            // Navigasyon hatası (genellikle nav_graph.xml'de action ID'si yanlışsa oluşur)
-            Toast.makeText(getContext(), "Detay sayfasına yönlendirme hatası: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Detail navigation failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }

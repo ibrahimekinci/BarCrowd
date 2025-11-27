@@ -59,14 +59,13 @@ public class MyLiveUpdatesAdapter extends RecyclerView.Adapter<MyLiveUpdatesAdap
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView ivAvatar, ivThumbnail;
+        private final ImageView  ivThumbnail;
         private final TextView tvVenueName, tvTimeAgo, tvDescription;
         private final Chip chipCrowd, chipWait, chipAge;
         private final ImageButton btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivAvatar = itemView.findViewById(R.id.iv_user_avatar);
             ivThumbnail = itemView.findViewById(R.id.iv_thumbnail);
             tvVenueName = itemView.findViewById(R.id.tv_venue_name);
             tvTimeAgo = itemView.findViewById(R.id.tv_time_ago);
