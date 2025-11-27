@@ -1,6 +1,5 @@
 package com.ibrahimekinci.barcrowd.ui.activity;
 
-
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -10,6 +9,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
@@ -28,51 +28,66 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // EdgeToEdge.enable(this); // Disabling for now, can cause padding issues
         setContentView(R.layout.activity_main);
 
-        // --- 1. Get UseCase ---
+        // --- 1. Get Dependencies ---
         DependencyInjector injector = ((BarCrowdApplication) getApplication()).getDependencyInjector();
         isUserLoggedInUseCase = injector.getIsUserLoggedInUseCase();
 
-        // --- 2. Find NavController---
-        // This is the fix for the crash
+        // --- 2. Find NavController ---
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
 
-        // Get the NavController from the NavHostFragment
-        navController = navHostFragment.getNavController();
+        if (navHostFragment != null) {
+            navController = navHostFragment.getNavController();
 
-        // --- 3. Setup BottomNav ---
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+            // --- 3. Setup BottomNav ---
+            BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
-        // Standard navigation setup (for Home and Search)
-        NavigationUI.setupWithNavController(bottomNav, navController);
+            // Initial setup for visual synchronization
+            NavigationUI.setupWithNavController(bottomNav, navController);
 
-        // --- 4. LOGIC: Listener for Protected Tabs ---
-        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
+            // --- 4. Custom Navigation Logic ---
+            // A. Authentication checks for specific tabs.
+            // B. Resetting the tab state (clearing back stack) on every click.
+            bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int itemId = item.getItemId();
 
-                if (itemId == R.id.newLiveUpdateFragment) {
-                    // These are protected tabs. Is the user logged in?
-                    if (isUserLoggedInUseCase.execute()) {
-                        // User is logged in, proceed normally.
-                        return NavigationUI.onNavDestinationSelected(item, navController);
-                    } else {
-                        // Not logged in. Navigate to SignInFragment.
-                        // 'action_global_to_signInFragment' was defined in nav_graph.xml
-                        navController.navigate(R.id.action_global_to_signInFragment);
-                        return false; // We handled the navigation, don't proceed.
+                    // --- A. Authentication Check ---
+                    // If the user tries to access "New Live Update", check if logged in.
+                    if (itemId == R.id.newLiveUpdateFragment) {
+                        if (!isUserLoggedInUseCase.execute()) {
+                            // Not logged in -> Redirect to Sign In
+                            navController.navigate(R.id.action_global_to_signInFragment);
+                            return false; // Do not select the tab
+                        }
                     }
+
+                    // --- B. Navigation with State Reset ---
+                    // custom NavOptions to ensure the tab opens from "zero"
+                    // (clearing any previous search results or nested screens).
+                    NavOptions.Builder builder = new NavOptions.Builder()
+                            .setLaunchSingleTop(true)
+                            .setRestoreState(false); // CRITICAL: Do not restore old state (fresh start)
+
+                    // Clear the back stack up to the destination graph
+                    builder.setPopUpTo(itemId, true);
+
+                    try {
+                        navController.navigate(itemId, null, builder.build());
+                    } catch (IllegalArgumentException e) {
+                        // Handle rare edge cases where destination is unknown
+                        return false;
+                    }
+
+                    return true;
                 }
+            });
+        }
 
-                // For all other items (Home, Search, account drawer menu), use the standard navigation.
-                return NavigationUI.onNavDestinationSelected(item, navController);
-            }
-        });
-
+        // --- 5. Handle Window Insets (Padding for system bars) ---
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
