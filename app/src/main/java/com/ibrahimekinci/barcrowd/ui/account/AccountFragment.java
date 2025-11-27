@@ -26,11 +26,10 @@ import com.ibrahimekinci.barcrowd.util.AppLogger;
  */
 public class AccountFragment extends Fragment {
 
-    private IsUserLoggedInUseCase isUserLoggedInUseCase; // For auth check
+    private IsUserLoggedInUseCase isUserLoggedInUseCase;
     private AccountViewModel viewModel;
     private NavController navController;
 
-    // View Ids from fragment_account.xml
     private View cardMyProfile;
     private View cardMyUpdates;
     private View cardLogout;

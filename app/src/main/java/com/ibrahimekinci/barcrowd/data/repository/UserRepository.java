@@ -1,6 +1,7 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
+
 import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
 import com.ibrahimekinci.barcrowd.domain.model.User;
 

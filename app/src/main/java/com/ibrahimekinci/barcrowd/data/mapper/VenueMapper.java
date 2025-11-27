@@ -3,7 +3,6 @@ package com.ibrahimekinci.barcrowd.data.mapper;
 import com.google.firebase.Timestamp;
 import com.ibrahimekinci.barcrowd.data.local.VenueEntity;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
-import java.util.Date;
 
 public class VenueMapper {
 

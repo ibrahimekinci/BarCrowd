@@ -1,9 +1,9 @@
 package com.ibrahimekinci.barcrowd.ui.auth;
 
 import androidx.lifecycle.ViewModel;
+
 import com.ibrahimekinci.barcrowd.data.remote.FirebaseAuthWrapper;
 import com.ibrahimekinci.barcrowd.domain.usecase.SignUpUseCase;
-import com.ibrahimekinci.barcrowd.util.ValidationException;
 
 /**
  * ViewModel for the SignUpFragment.

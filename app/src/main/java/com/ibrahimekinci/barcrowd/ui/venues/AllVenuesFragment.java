@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -12,17 +13,17 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.appbar.MaterialToolbar;
 import com.ibrahimekinci.barcrowd.BarCrowdApplication;
 import com.ibrahimekinci.barcrowd.R;
 import com.ibrahimekinci.barcrowd.di.DependencyInjector;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
-import com.ibrahimekinci.barcrowd.ui.home.VenueAdapter; // Reusing the adapter from home
+import com.ibrahimekinci.barcrowd.ui.home.VenueAdapter;
 
 /**
  * Fragment to display a complete list of all venues, sorted alphabetically.
  */
-// --- UPDATED: Implemented click listener ---
 public class AllVenuesFragment extends Fragment implements VenueAdapter.OnVenueClickListener {
 
     private AllVenuesViewModel viewModel;

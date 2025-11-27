@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast; // Added for feedback
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,7 +31,7 @@ import com.ibrahimekinci.barcrowd.R;
 import com.ibrahimekinci.barcrowd.di.DependencyInjector;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
-import com.ibrahimekinci.barcrowd.domain.usecase.IsUserLoggedInUseCase; // Import Auth Check
+import com.ibrahimekinci.barcrowd.domain.usecase.IsUserLoggedInUseCase;
 import com.ibrahimekinci.barcrowd.ui.home.LiveUpdateAdapter;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 

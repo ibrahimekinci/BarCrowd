@@ -17,7 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.appbar.MaterialToolbar; // Eklendi
+import com.google.android.material.appbar.MaterialToolbar;
 import com.ibrahimekinci.barcrowd.BarCrowdApplication;
 import com.ibrahimekinci.barcrowd.R;
 import com.ibrahimekinci.barcrowd.di.DependencyInjector;
@@ -46,13 +46,12 @@ public class AllLiveUpdatesFragment extends Fragment implements LiveFeedAdapter.
 
         navController = Navigation.findNavController(view);
 
-        // View Tanımlamaları
         rvFeed = view.findViewById(R.id.rv_live_feed);
         pbLoading = view.findViewById(R.id.pb_loading);
         tvEmptyView = view.findViewById(R.id.tv_empty_view);
         toolbar = view.findViewById(R.id.toolbar); // Eklendi
 
-        // Toolbar Geri Tuşu Ayarı
+        // Toolbar
         if (toolbar != null) {
             toolbar.setNavigationOnClickListener(v -> navController.popBackStack());
         }

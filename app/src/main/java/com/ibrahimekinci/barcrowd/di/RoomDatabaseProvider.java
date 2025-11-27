@@ -13,10 +13,6 @@ import com.ibrahimekinci.barcrowd.data.local.AppDatabase;
  */
 public interface RoomDatabaseProvider {
     AppDatabase getDatabase(Context context);
-
-    /**
-     * Production implementation that uses the real Room build chain.
-     */
     class ProductionProvider implements RoomDatabaseProvider {
         @Override
         public AppDatabase getDatabase(Context context) {

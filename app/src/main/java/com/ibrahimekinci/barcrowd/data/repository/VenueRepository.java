@@ -1,8 +1,10 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
+
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
 import com.ibrahimekinci.barcrowd.domain.model.VenueFilterOptions;
+
 import java.util.List;
 
 public interface VenueRepository {

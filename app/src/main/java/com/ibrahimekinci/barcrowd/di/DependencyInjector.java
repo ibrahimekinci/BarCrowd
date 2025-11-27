@@ -141,9 +141,6 @@ public class DependencyInjector {
         return new GetAllLiveUpdatesUseCase(getLiveUpdateRepository());
     }
 
-    public GetMyContributionsUseCase getGetMyContributionsUseCase() {
-        return new GetMyContributionsUseCase(getLiveUpdateRepository());
-    }
     public SyncHomeDataUseCase getSyncHomeDataUseCase() {
         return new SyncHomeDataUseCase(getVenueRepository(), getLiveUpdateRepository());
     }

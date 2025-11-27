@@ -17,11 +17,9 @@ public interface LiveUpdateDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertLiveUpdates(List<LiveUpdateEntity> updates);
 
-    // DÜZELTME: Sadece silinmemiş olanları getir (isDeleted = 0 -> false)
     @Query("SELECT * FROM live_updates WHERE isDeleted = 0 ORDER BY createdAt DESC")
     LiveData<List<LiveUpdateEntity>> getAllLiveUpdates();
 
-    // DÜZELTME: Sadece silinmemiş olanları getir
     @Query("SELECT * FROM live_updates WHERE isDeleted = 0 ORDER BY createdAt DESC")
     List<LiveUpdateEntity> getAllLiveUpdatesSync();
 

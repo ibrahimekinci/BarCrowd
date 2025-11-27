@@ -3,6 +3,7 @@ package com.ibrahimekinci.barcrowd.ui.search.results;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.ibrahimekinci.barcrowd.domain.usecase.SearchVenuesUseCase;
 
 public class ResultsViewModelFactory implements ViewModelProvider.Factory {

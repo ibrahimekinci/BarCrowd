@@ -18,7 +18,7 @@ public class HomeViewModel extends ViewModel {
 
     private final GetHomePageVenuesUseCase getHomePageVenuesUseCase;
     private final GetRecentLiveUpdatesUseCase getRecentLiveUpdatesUseCase;
-    private final SyncHomeDataUseCase syncHomeDataUseCase; // YENİ
+    private final SyncHomeDataUseCase syncHomeDataUseCase;
 
     private final LiveData<List<Venue>> homePageVenues;
     private final LiveData<List<LiveUpdate>> recentLiveUpdates;

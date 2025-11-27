@@ -12,7 +12,7 @@ public class HomeViewModelFactory implements ViewModelProvider.Factory {
 
     private final GetHomePageVenuesUseCase getHomePageVenuesUseCase;
     private final GetRecentLiveUpdatesUseCase getRecentLiveUpdatesUseCase;
-    private final SyncHomeDataUseCase syncHomeDataUseCase; // YENİ
+    private final SyncHomeDataUseCase syncHomeDataUseCase;
 
     public HomeViewModelFactory(GetHomePageVenuesUseCase getHomePageVenuesUseCase,
                                 GetRecentLiveUpdatesUseCase getRecentLiveUpdatesUseCase,

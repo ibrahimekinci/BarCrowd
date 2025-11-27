@@ -162,7 +162,6 @@ public class LiveUpdateDetailFragment extends Fragment {
     private void observeViewModel() {
         viewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
             if (user != null && liveUpdate != null) {
-                // Eğer giriş yapan kullanıcı bu postun sahibiyse Silme butonunu göster
                 if (user.getUserId().equals(liveUpdate.getUserId())) {
                     btnDelete.setVisibility(View.VISIBLE);
                 } else {
@@ -183,8 +182,6 @@ public class LiveUpdateDetailFragment extends Fragment {
 
     private void performDelete() {
         loadingOverlay.setVisibility(View.VISIBLE);
-
-        // DÜZELTME: LiveUpdateRepository.DeleteCallback kullanılıyor
         viewModel.deleteUpdate(liveUpdate, new LiveUpdateRepository.DeleteCallback() {
             @Override
             public void onSuccess() {

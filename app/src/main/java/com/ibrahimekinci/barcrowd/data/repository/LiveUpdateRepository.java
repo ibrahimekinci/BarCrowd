@@ -1,8 +1,9 @@
 package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
-import com.ibrahimekinci.barcrowd.data.remote.FirestoreWrapper;
+
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
+
 import java.util.List;
 
 public interface LiveUpdateRepository {

@@ -25,7 +25,6 @@ public class Validators {
             "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE
     );
 
-    // UPDATED: Pattern to only allow letters and spaces for full name
     private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z ]+$");
 
     private static final int NAME_MAX_LENGTH = 50; // As specified in original file

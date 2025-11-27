@@ -4,8 +4,6 @@ import com.google.firebase.Timestamp;
 import com.ibrahimekinci.barcrowd.data.local.LiveUpdateEntity;
 import com.ibrahimekinci.barcrowd.domain.model.LiveUpdate;
 
-import java.util.Date;
-
 public class LiveUpdateMapper {
 
     public static LiveUpdateEntity toEntity(LiveUpdate model) {

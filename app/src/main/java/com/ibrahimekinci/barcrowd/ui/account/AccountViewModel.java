@@ -1,6 +1,7 @@
 package com.ibrahimekinci.barcrowd.ui.account;
 
 import androidx.lifecycle.ViewModel;
+
 import com.ibrahimekinci.barcrowd.domain.usecase.SignOutUseCase;
 
 /**

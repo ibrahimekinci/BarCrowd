@@ -2,6 +2,7 @@ package com.ibrahimekinci.barcrowd.domain.model;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.ServerTimestamp;
+
 import java.io.Serializable;
 
 public class User implements Serializable {

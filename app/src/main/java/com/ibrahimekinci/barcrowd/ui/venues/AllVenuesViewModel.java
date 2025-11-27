@@ -2,8 +2,10 @@ package com.ibrahimekinci.barcrowd.ui.venues;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+
 import com.ibrahimekinci.barcrowd.domain.model.Venue;
 import com.ibrahimekinci.barcrowd.domain.usecase.GetAllVenuesUseCase;
+
 import java.util.List;
 
 /**

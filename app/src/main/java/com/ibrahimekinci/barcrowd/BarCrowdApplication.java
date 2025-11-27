@@ -5,7 +5,6 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 
 import com.google.firebase.FirebaseApp;
-import com.ibrahimekinci.barcrowd.debug.SampleDataSeeder;
 import com.ibrahimekinci.barcrowd.di.DependencyInjector;
 import com.ibrahimekinci.barcrowd.util.ConnectivityReceiver;
 

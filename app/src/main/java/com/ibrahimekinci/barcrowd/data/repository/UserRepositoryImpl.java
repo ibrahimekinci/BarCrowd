@@ -3,6 +3,7 @@ package com.ibrahimekinci.barcrowd.data.repository;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -82,8 +83,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public LiveData<User> getCurrentUser() {
-        // If user is logged in BUT data hasn't (asynchronously) arrived yet,
-        // (ProfileFragment opening immediately) re-trigger the fetch.
         if (isUserLoggedIn() && currentUserData.getValue() == null) {
             AppLogger.d("UserRepository: User is logged in but data is null. Triggering fetch.");
             fetchUserDocument(authWrapper.getCurrentUser().getUid());
@@ -150,10 +149,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void updateUser(User user, FirebaseAuthWrapper.AuthCallback callback) {
         db.collection("Users").document(user.getUserId())
-                .set(user, SetOptions.merge()) // .merge() only updates fields
+                .set(user, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
                     AppLogger.i("User profile updated in Firestore: " + user.getUserId());
-                    // Also update the LiveData locally (no need to re-fetch)
                     currentUserData.postValue(user);
                     callback.onSuccess(null); // Success, no FirebaseUser to return
                 })

@@ -3,6 +3,7 @@ package com.ibrahimekinci.barcrowd.ui.venues;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.ibrahimekinci.barcrowd.domain.usecase.GetAllVenuesUseCase;
 
 /**

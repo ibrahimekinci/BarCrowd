@@ -15,8 +15,6 @@ public class ResultsViewModel extends ViewModel {
 
     private final SearchVenuesUseCase searchVenuesUseCase;
     private final MutableLiveData<VenueFilterOptions> filterInput = new MutableLiveData<>();
-
-    // Field is declared but initialized in constructor to ensure useCase is ready
     public final LiveData<List<Venue>> searchResults;
 
     public ResultsViewModel(SearchVenuesUseCase searchVenuesUseCase) {

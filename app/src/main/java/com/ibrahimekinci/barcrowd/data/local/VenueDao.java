@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+
 import java.util.List;
 
 @Dao
@@ -22,7 +23,6 @@ public interface VenueDao {
     @Query("SELECT * FROM venues WHERE venueId = :venueId")
     VenueEntity getVenueById(String venueId);
 
-    // Updated for new field names
     @Query("SELECT * FROM venues WHERE showOnHomePage = 1 ORDER BY lastLiveUpdateCreatedAt DESC")
     LiveData<List<VenueEntity>> getHomePageVenues();
 

@@ -1,8 +1,10 @@
 package com.ibrahimekinci.barcrowd.domain.model;
 
 import androidx.annotation.NonNull;
+
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.ServerTimestamp;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

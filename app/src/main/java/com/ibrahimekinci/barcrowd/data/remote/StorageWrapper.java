@@ -7,7 +7,6 @@ import android.provider.OpenableColumns;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.ibrahimekinci.barcrowd.di.DependencyInjector;
 import com.ibrahimekinci.barcrowd.util.AppLogger;
 import com.ibrahimekinci.barcrowd.util.StorageException;

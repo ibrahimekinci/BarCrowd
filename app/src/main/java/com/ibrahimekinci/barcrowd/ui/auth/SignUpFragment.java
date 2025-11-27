@@ -13,8 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -113,7 +113,6 @@ public class SignUpFragment extends Fragment {
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     showLoading(false);
-                    // FIX: Use .e (error) for exceptions, which matches your AppLogger
                     AppLogger.e("Sign up failed", e);
 
                     // This is the user-friendly error handling logic
@@ -156,7 +155,6 @@ public class SignUpFragment extends Fragment {
                 .setPopUpTo(R.id.nav_graph, true) // Clear up to the start of the graph
                 .build();
 
-        // Add check to prevent crash if action is not found
         if (navController.getCurrentDestination() != null &&
                 navController.getCurrentDestination().getAction(R.id.action_signUpFragment_to_homeFragment) != null) {
             navController.navigate(R.id.action_signUpFragment_to_homeFragment, null, navOptions);

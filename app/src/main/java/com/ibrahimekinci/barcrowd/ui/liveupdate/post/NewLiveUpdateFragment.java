@@ -165,9 +165,7 @@ public class NewLiveUpdateFragment extends Fragment {
         btnClear.setOnClickListener(v -> clearSelection());
         ivPlayIcon.setOnClickListener(v -> startVideoPlayback());
 
-        // --- DÜZELTME: BUTON TIKLAMA ---
         btnPost.setOnClickListener(v -> {
-            // Eğer ID null ise, ekranda yazan isimle tekrar eşleştirmeyi dene
             if (selectedVenueId == null) {
                 String currentText = actvVenue.getText().toString();
                 for (Venue venue : venueList) {
@@ -197,8 +195,6 @@ public class NewLiveUpdateFragment extends Fragment {
         });
     }
 
-    // ... (Diğer yardımcı metodlar: observeViewModel, launchCamera vb. aynı kalacak) ...
-    // Hızlıca yeniden ekliyorum ki kopukluk olmasın
     private void checkPermissionsAndLaunchCamera() {
         List<String> permissions = new ArrayList<>();
         permissions.add(Manifest.permission.CAMERA);

@@ -78,8 +78,6 @@ public class FirebaseAuthWrapper {
         newUser.setFullName(fullName);
         newUser.setUsername(username);
         newUser.setEmail(firebaseUser.getEmail());
-        // All other fields (isTrusted, isDeleted, etc.) will use their Java defaults (false, null)
-        // which matches your Firestore rules [cite: Your provided firestore.rules]
 
         firestore.collection("Users").document(firebaseUser.getUid()).set(newUser)
                 .addOnSuccessListener(aVoid -> {
@@ -88,8 +86,6 @@ public class FirebaseAuthWrapper {
                 })
                 .addOnFailureListener(e -> {
                     AppLogger.e("Failed to create user document", e);
-                    // Critical error: User auth was created but their database entry failed.
-                    // Delete the auth user to allow them to try again.
                     firebaseUser.delete();
                     callback.onFailure(new AuthException("Failed to save user profile: " + e.getMessage(), e));
                 });
