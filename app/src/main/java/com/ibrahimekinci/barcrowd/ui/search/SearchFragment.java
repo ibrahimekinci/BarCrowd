@@ -63,7 +63,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void setupSpinners() {
-        setupSpinner(spType, new String[]{"Any", "Bar", "Club", "Pub", "Restaurant"});
+        setupSpinner(spType, new String[]{"Any", "Bar", "Club", "Pub"});
         setupSpinner(spCrowd, new String[]{"Any", "Low", "Medium", "High"});
         setupSpinner(spWait, new String[]{"Any", "0–5", "5–15", "15–30", "30–45", "45+"});
         setupSpinner(spAge, new String[]{"Any", "18–21", "21–24", "25–30", "30–35", "35+"});

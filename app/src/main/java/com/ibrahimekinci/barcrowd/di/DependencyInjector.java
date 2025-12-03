@@ -37,7 +37,7 @@ public class DependencyInjector {
     private static AppDatabase db;
     private static FirestoreWrapper firestore;
     private static FirebaseAuthWrapper authWrapper;
-    private static StorageWrapper storageWrapper; // Added
+    private static StorageWrapper storageWrapper;
     private static BarCrowdApplication app;
 
     private static RoomDatabaseProvider dbProvider = new RoomDatabaseProvider.ProductionProvider();

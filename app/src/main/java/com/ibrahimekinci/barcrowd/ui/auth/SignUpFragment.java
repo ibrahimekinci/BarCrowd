@@ -96,7 +96,6 @@ public class SignUpFragment extends Fragment {
         String email = etEmail.getText() != null ? etEmail.getText().toString() : "";
         String password = etPassword.getText() != null ? etPassword.getText().toString() : "";
 
-        // The try/catch block is removed, as the UseCase now handles all errors via the callback.
         viewModel.signUp(email, password, fullName, username, new FirebaseAuthWrapper.AuthCallback() {
             @Override
             public void onSuccess(FirebaseUser user) {

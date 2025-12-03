@@ -55,7 +55,7 @@ public class ProfileViewModel extends ViewModel {
      * @param userId The ID of the current user.
      * @param callback Callback for success (returns download URL) or failure.
      */
-    public void updateProfilePhoto(Uri photoUri, String userId, StorageWrapper.Callback<String> callback) {
-        storageWrapper.uploadProfilePhoto(photoUri, userId, callback);
-    }
+//    public void updateProfilePhoto(Uri photoUri, String userId, StorageWrapper.Callback<String> callback) {
+//        storageWrapper.uploadProfilePhoto(photoUri, userId, callback);
+//    }
 }

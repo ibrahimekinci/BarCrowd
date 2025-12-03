@@ -30,7 +30,6 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
     private final Application app;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    // Canlı dinleyiciyi takip etmek için değişken (Memory leak ve duplicate önler)
     private ListenerRegistration liveUpdatesListener;
 
     public LiveUpdateRepositoryImpl(AppDatabase db, FirestoreWrapper firestore, Application app) {
@@ -39,11 +38,8 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
         this.app = app;
     }
 
-    // --- OTOMATİK SENKRONİZASYON (ANA ÇÖZÜM) ---
-
     @Override
     public void syncRecentLiveUpdates() {
-        // Eğer zaten bir dinleyici varsa tekrar oluşturma (Duplicate önleme)
         if (liveUpdatesListener != null) {
             AppLogger.d("LiveUpdates listener already active. Skipping re-init.");
             return;
@@ -56,7 +52,6 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(100);
 
-        // Listener'ı başlatıyoruz ve referansını değişkene atıyoruz
         liveUpdatesListener = query.addSnapshotListener((snapshots, e) -> {
             if (e != null) {
                 AppLogger.e("Sync listener failed", e);
@@ -69,31 +64,29 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
                 executor.execute(() -> {
                     int addedCount = 0;
                     for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                        // Sadece EKLENEN ve DEĞİŞENLERİ (Modified) alıyoruz
+                        // only for modified items
                         if (dc.getType() == DocumentChange.Type.ADDED || dc.getType() == DocumentChange.Type.MODIFIED) {
                             LiveUpdate model = dc.getDocument().toObject(LiveUpdate.class);
                             LiveUpdateEntity entity = LiveUpdateMapper.toEntity(model);
 
                             if (entity != null) {
                                 entity.setSyncStatus(true);
-                                // Room'a yazınca LiveData Home'da otomatik tetiklenir
+                                // after updating the local db, home page will be updated automatically
                                 dao.insert(entity);
                                 addedCount++;
                             }
                         }
-                        // Silinenleri de yerel DB'den silebiliriz (Optional)
-                        if (dc.getType() == DocumentChange.Type.REMOVED) {
-                            LiveUpdate model = dc.getDocument().toObject(LiveUpdate.class);
-                            // dao.deleteById(model.getUpdateId()); gibi bir metod varsa kullanılabilir
-                        }
+                        // only for deleted items, no need because of soft delete
+//                        if (dc.getType() == DocumentChange.Type.REMOVED) {
+//                            LiveUpdate model = dc.getDocument().toObject(LiveUpdate.class);
+//                            dao.deleteById(model.getUpdateId()); gibi bir metod varsa kullanılabilir
+//                        }
                     }
                     AppLogger.d("✅ Processed " + addedCount + " updates into Local DB via Listener.");
                 });
             }
         });
     }
-
-    // --- YENİ POST ATMA İŞLEMİ ---
 
     @Override
     public void saveLiveUpdate(LiveUpdate liveUpdate, SaveCallback callback) {
@@ -145,7 +138,6 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
 
     @Override
     public void getAllLiveUpdates(LoadCallback callback) {
-        // Bu metod callback tabanlı veri çekmek içindir (Manuel yenileme vs.)
         firestore.getDb().collection("LiveUpdates")
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
@@ -161,12 +153,33 @@ public class LiveUpdateRepositoryImpl implements LiveUpdateRepository {
     }
 
     // Boilerplate / Empty methods to prevent compile errors
-    @Override public void postUpdate(LiveUpdate update) { saveLiveUpdate(update, null); }
-    @Override public LiveData<List<LiveUpdate>> getRecentLiveUpdates() { return getAllLiveUpdates(); }
-    @Override public LiveData<List<LiveUpdate>> getUpdatesForVenue(String venueId) { return new MutableLiveData<>(new ArrayList<>()); }
-    @Override public LiveData<List<LiveUpdate>> getUserContributions(String userId) { return new MutableLiveData<>(new ArrayList<>()); }
-    @Override public void syncUpdates(String venueId) {}
-    @Override public void syncPending() {}
+    @Override
+    public void postUpdate(LiveUpdate update) {
+        saveLiveUpdate(update, null);
+    }
+
+    @Override
+    public LiveData<List<LiveUpdate>> getRecentLiveUpdates() {
+        return getAllLiveUpdates();
+    }
+
+    @Override
+    public LiveData<List<LiveUpdate>> getUpdatesForVenue(String venueId) {
+        return new MutableLiveData<>(new ArrayList<>());
+    }
+
+    @Override
+    public LiveData<List<LiveUpdate>> getUserContributions(String userId) {
+        return new MutableLiveData<>(new ArrayList<>());
+    }
+
+    @Override
+    public void syncUpdates(String venueId) {
+    }
+
+    @Override
+    public void syncPending() {
+    }
 
     private void saveListToLocal(List<LiveUpdate> list) {
         executor.execute(() -> {

@@ -75,7 +75,6 @@ public class NewLiveUpdateViewModel extends ViewModel {
             return;
         }
 
-        // Seçilen mekanı bul (Bilgilerini kopyalamak için)
         Venue selectedVenue = findVenueById(venueId);
         if (selectedVenue == null) {
             error.setValue("Selected venue not found in list.");
@@ -106,7 +105,6 @@ public class NewLiveUpdateViewModel extends ViewModel {
         });
     }
 
-    // Yardımcı metod: ID'den Venue nesnesini bulur
     private Venue findVenueById(String venueId) {
         List<Venue> venues = allVenues.getValue();
         if (venues != null) {
@@ -130,17 +128,14 @@ public class NewLiveUpdateViewModel extends ViewModel {
                 LiveUpdate update = new LiveUpdate();
                 update.setUpdateId(updateId);
 
-                // İlişkisel ID'ler
                 update.setVenueId(venue.getVenueId());
                 update.setUserId(user.getUserId());
 
-                // --- DÜZELTİLEN KISIM: Denormalize Veriler ---
-                // Mekan bilgileri (Feed'de görünmesi için)
+                // --- Denormalize data ---
                 update.setVenueName(venue.getName());
                 update.setVenueType(venue.getType());
                 update.setVenueLogoUrl(venue.getLogoUrl());
 
-                // Kullanıcı bilgileri
                 update.setUserName(user.getUsername());
                 update.setUserPhotoUrl(user.getProfilePhotoUrl());
                 // --------------------------------------------
